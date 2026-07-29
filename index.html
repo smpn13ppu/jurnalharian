@@ -38,7 +38,7 @@
           <div class="school-logo-badge">13</div>
           <div class="brand-text">
             <h1>JurnalGuru Pro</h1>
-            <p>SMP NEGERI 13 Penajam Paser Utara</p>
+            <p id="header-school-name">Satuan Pendidikan</p>
           </div>
         </div>
       </div>
@@ -101,7 +101,7 @@
 
         <div class="drawer-footer">
           <p><strong>JurnalGuru Pro v1.0.0</strong></p>
-          <p>Terintegrasi Permendikbudristek 37.5 Jam</p>
+          <p>&copy; Muhammad Budi Saputra</p>
         </div>
       </nav>
     </div>
@@ -781,13 +781,16 @@
         <div class="quick-entry-container" style="margin-bottom:1.5rem;">
           <div class="quick-tabs-nav">
             <button class="quick-tab-btn set-tab-btn active" data-set-tab="set-tab-umum">
-              <i class="fas fa-sliders"></i> <span>1. Profil &amp; Database</span>
+              <i class="fas fa-sliders"></i> <span>Profil &amp; Database</span>
             </button>
             <button class="quick-tab-btn set-tab-btn" data-set-tab="set-tab-kegiatan">
-              <i class="fas fa-calendar-alt"></i> <span>2. Pengaturan Kegiatan</span>
+              <i class="fas fa-calendar-alt"></i> <span>Pengaturan Kegiatan</span>
             </button>
             <button class="quick-tab-btn set-tab-btn" data-set-tab="set-tab-backup">
-              <i class="fas fa-database"></i> <span>3. Backup &amp; Reset</span>
+              <i class="fas fa-database"></i> <span>Backup &amp; Reset</span>
+            </button>
+            <button class="quick-tab-btn set-tab-btn" data-set-tab="set-tab-author">
+              <i class="fas fa-user-circle"></i> <span>Author</span>
             </button>
           </div>
 
@@ -1071,7 +1074,7 @@
             <!-- SECTION 3: DANGER ZONE (RESET DATA) -->
             <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:var(--radius-md); padding:1.25rem;">
               <h4 style="color:#991B1B; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:8px;">
-                <i class="fas fa-exclamation-triangle" style="color:#DC2626;"></i> 3. Zona Bahaya (Reset Semua Data)
+                <i class="fas fa-exclamation-triangle" style="color:#DC2626;"></i> Zona Bahaya (Reset Semua Data)
               </h4>
               <p style="font-size:0.85rem; color:#7F1D1D; margin:0 0 1rem 0;">Tindakan ini akan <strong>menghapus secara
                   permanen</strong> seluruh entri jurnal harian, data siswa, modul materi, serta mengembalikan semua
@@ -1082,6 +1085,26 @@
               </button>
             </div>
 
+          </div>
+
+          <!-- SUB-TAB 4: AUTHOR -->
+          <div id="set-tab-author" class="tab-pane" style="padding: 1.5rem;">
+            <div style="max-width: 580px; margin: 1rem auto; text-align: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 20px; padding: 2.25rem 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.03);">
+              <div style="width: 84px; height: 84px; background: linear-gradient(135deg, #0F766E, #0D9488); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.3rem; margin: 0 auto 1.25rem; box-shadow: 0 6px 16px rgba(13,148,136,0.35);">
+                <i class="fas fa-user-ninja"></i>
+              </div>
+              <h3 style="color: #0F172A; font-weight: 800; font-size: 1.35rem; margin-bottom: 0.3rem; letter-spacing: -0.2px;">Muhammad Budi Saputra</h3>
+              <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 1.75rem; font-weight: 500;">Pengembang &amp; Kreator JurnalGuru Pro</p>
+
+              <div style="display: flex; flex-direction: column; gap: 0.85rem; max-width: 380px; margin: 0 auto;">
+                <a href="https://www.instagram.com/mboodtsaputra" target="_blank" rel="noopener" class="btn-primary" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border: none; font-weight: 700; gap: 10px; justify-content: center; border-radius: 14px; padding: 0.85rem 1.25rem; text-decoration: none;">
+                  <i class="fab fa-instagram" style="font-size: 1.25rem;"></i> Follow Instagram @mboodtsaputra
+                </a>
+                <a href="https://www.youtube.com/@mboodtsaputra3237" target="_blank" rel="noopener" class="btn-danger" style="background: #FF0000; border: none; font-weight: 700; gap: 10px; justify-content: center; border-radius: 14px; padding: 0.85rem 1.25rem; text-decoration: none;">
+                  <i class="fab fa-youtube" style="font-size: 1.25rem;"></i> Subscribe YouTube Channel
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>

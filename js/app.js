@@ -48,7 +48,8 @@ window.App = {
     // Render default view
     this.switchView('beranda');
 
-    // Update Google Sheets Connection Badge
+    // Update Google Sheets Connection Badge & School Name
+    this.updateHeaderSchoolName();
     this.updateHeaderStatus();
 
     // Auto-prompt sync modal if opened on a new device/browser (disconnected state)
@@ -201,6 +202,14 @@ window.App = {
     }
 
     badge.onclick = () => this.openModal('modal-sheets-sync-guide');
+  },
+
+  updateHeaderSchoolName() {
+    const el = document.getElementById('header-school-name');
+    if (el) {
+      const settings = Store.getSettings();
+      el.textContent = settings.sekolah && settings.sekolah.trim() !== '' ? settings.sekolah : 'Satuan Pendidikan';
+    }
   },
 
   // Global Toast System

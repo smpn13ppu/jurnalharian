@@ -20,7 +20,7 @@ const DEFAULT_PAGI_CONFIG = {
 };
 
 const SEED_SETTINGS = {
-  sekolah: 'SMP NEGERI 13 Penajam Paser Utara',
+  sekolah: '',
   namaGuru: '',
   nipGuru: '',
   namaKepsek: '',

@@ -331,7 +331,7 @@ export const RekapAbsenView = {
       </td>
       <td style="width:50%; vertical-align:top; border:none; padding:0 0 0 15px;">
         <div class="meta-line">Bulan / Periode: ${monthYearStr}</div>
-        <div class="meta-line">Satuan Pendidikan: ${settings.sekolah || 'SMP NEGERI 13 Penajam Paser Utara'}</div>
+        <div class="meta-line">Satuan Pendidikan: ${settings.sekolah || '-'}</div>
         <div class="meta-line">Tanggal Unduh: ${todayStr}</div>
       </td>
     </tr>

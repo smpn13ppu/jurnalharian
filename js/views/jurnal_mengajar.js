@@ -242,7 +242,7 @@ export const JurnalMengajarView = {
         ${settings.nipGuru ? `<div class="meta-line">NIP: ${settings.nipGuru}</div>` : ''}
       </td>
       <td style="width:50%; vertical-align:top; border:none; padding:0 0 0 15px;">
-        <div class="meta-line">Satuan Pendidikan: ${settings.sekolah || 'SMP NEGERI 13 Penajam Paser Utara'}</div>
+        <div class="meta-line">Satuan Pendidikan: ${settings.sekolah || '-'}</div>
         <div class="meta-line">Tanggal Unduh: ${todayStr}</div>
       </td>
     </tr>

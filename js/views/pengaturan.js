@@ -41,7 +41,11 @@ export const PengaturanView = {
 
     const settings = Store.getSettings();
 
-    document.getElementById('set-sekolah').value = settings.sekolah || 'SMP NEGERI 13 Penajam Paser Utara';
+    const sekolahInput = document.getElementById('set-sekolah');
+    if (sekolahInput) {
+      sekolahInput.value = settings.sekolah || '';
+      sekolahInput.placeholder = 'Masukkan Nama Satuan Pendidikan / Sekolah';
+    }
     document.getElementById('set-nama-guru').value = settings.namaGuru || '';
     document.getElementById('set-nip-guru').value = settings.nipGuru || '';
     document.getElementById('set-nama-kepsek').value = settings.namaKepsek || '';
@@ -63,6 +67,7 @@ export const PengaturanView = {
       };
       Store.saveSettings(updated);
       window.App.showToast('Pengaturan Profil & Database berhasil disimpan!', 'success');
+      window.App.updateHeaderSchoolName();
       window.App.updateHeaderStatus();
     };
   },
