@@ -3,7 +3,11 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0F172A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JurnalGuru">
   <title>JurnalGuru Pro - SMP NEGERI 13 Penajam Paser Utara</title>
 
   <!-- Google Fonts & FontAwesome -->
@@ -134,9 +138,8 @@
             <i class="fas fa-lock"></i>
           </div>
           <div class="guard-info">
-            <h4>Akses Terkunci: Database Google Sheets Belum Terhubung!</h4>
-            <p>Untuk digunakan oleh banyak guru secara terpusat, aplikasi ini mewajibkan koneksi ke database Google
-              Sheets sekolah terlebih dahulu. Pengisian jurnal hanya dapat dilakukan setelah Google Sheets terhubung.
+            <h4>Hubungkan Database Google Sheets Anda</h4>
+            <p>Aplikasi ini dapat digunakan bersama oleh seluruh guru melalui 1 link web yang sama. Agar data jurnal Anda tersimpan rapi dan tidak bercampur dengan guru lain, setiap guru cukup memasukkan link Google Sheets (spreadsheet) miliknya sendiri. Klik tombol di bawah untuk menghubungkan.
             </p>
           </div>
           <button class="btn-primary" onclick="window.App.openModal('modal-sheets-sync-guide')">
@@ -1267,12 +1270,12 @@
   </div>
 
   <!-- ===================================================================
-       MODAL 4: PANDUAN INTEGRASI GOOGLE SHEETS & GITHUB PAGES
+       MODAL 4: PANDUAN INTEGRASI DATABASE GOOGLE SHEETS
        =================================================================== -->
   <div id="modal-sheets-sync-guide" class="modal-overlay">
     <div class="modal-container" style="max-width: 780px;">
       <div class="modal-header">
-        <h3><i class="fab fa-google-drive" style="color:#0F766E;"></i> Panduan Integrasi Google Sheets & GitHub Pages
+        <h3><i class="fab fa-google-drive" style="color:#0F766E;"></i> Panduan Integrasi Database Google Sheets
         </h3>
         <button class="modal-close-btn">&times;</button>
       </div>
@@ -1402,7 +1405,65 @@
     </div>
   </div>
 
+  <!-- MODAL CONFIRMATION RESET ALL DATA -->
+  <div id="modal-reset-data" class="modal-overlay">
+    <div class="modal-container" style="max-width: 480px;">
+      <div class="modal-header" style="border-bottom: 2px solid #FEE2E2;">
+        <h3 style="color: #DC2626;"><i class="fas fa-exclamation-triangle" style="color:#DC2626; margin-right:8px;"></i> Peringatan Reset Data</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-confirm-reset-data">
+        <div class="modal-body" style="text-align: center; padding: 1.5rem 1rem;">
+          <div style="width:60px; height:60px; background:#FEE2E2; color:#DC2626; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.8rem; margin:0 auto 1rem;">
+            <i class="fas fa-trash-alt"></i>
+          </div>
+          <h4 style="color:#1F2937; margin-bottom:0.5rem; font-size:1.1rem; font-weight:700;">Hapus Seluruh Data Aplikasi?</h4>
+          <p style="color:#6B7280; font-size:0.88rem; line-height:1.5; margin-bottom:1.25rem;">
+            Tindakan ini akan <strong style="color:#DC2626;">MENGHAPUS PERMANEN</strong> semua Jurnal, Data Siswa, Materi Pembelajaran, dan Pengaturan. Data yang dihapus tidak dapat dikembalikan.
+          </p>
+
+          <div class="form-group" style="text-align: left; background:#F8FAFC; padding:1rem; border-radius:10px; border:1px solid #E2E8F0;">
+            <label style="font-size:0.82rem; font-weight:700; color:#374151; display:block; margin-bottom:0.4rem;">
+              Ketik kata <span style="color:#DC2626; letter-spacing:1px; background:#FEE2E2; padding:2px 6px; border-radius:4px; font-weight:800;">RESET</span> untuk mengonfirmasi:
+            </label>
+            <input type="text" id="input-confirm-reset-text" class="form-control" placeholder="Ketik RESET disini..." autocomplete="off" required style="font-weight:700; text-transform:uppercase; letter-spacing:1px; text-align:center;">
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-danger" style="background:#DC2626; border-color:#DC2626;"><i class="fas fa-trash-alt"></i> Ya, Reset Semua Data</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Native Mobile Bottom Navigation Bar (Khusus Layar Smartphone) -->
+
+  <nav class="mobile-bottom-nav" aria-label="Navigasi Utama Mobile">
+    <button class="mobile-nav-item menu-item active" data-view="beranda">
+      <div class="mobile-nav-icon"><i class="fas fa-home"></i></div>
+      <span class="mobile-nav-label">Beranda</span>
+    </button>
+    <button class="mobile-nav-item menu-item" data-view="jurnal-mengajar">
+      <div class="mobile-nav-icon"><i class="fas fa-book-open"></i></div>
+      <span class="mobile-nav-label">Mengajar</span>
+    </button>
+    <button class="mobile-nav-item menu-item" data-view="jurnal-mingguan">
+      <div class="mobile-nav-icon"><i class="fas fa-calendar-check"></i></div>
+      <span class="mobile-nav-label">Jurnal 37.5</span>
+    </button>
+    <button class="mobile-nav-item menu-item" data-view="rekap-absen">
+      <div class="mobile-nav-icon"><i class="fas fa-user-check"></i></div>
+      <span class="mobile-nav-label">Rekap</span>
+    </button>
+    <button class="mobile-nav-item menu-item" data-view="pengaturan">
+      <div class="mobile-nav-icon"><i class="fas fa-cog"></i></div>
+      <span class="mobile-nav-label">Pengaturan</span>
+    </button>
+  </nav>
+
   <!-- Saving Loader Overlay -->
+
   <div id="saving-overlay" class="saving-overlay" style="display:none;" aria-hidden="true">
     <div class="saving-card">
       <div class="saving-spinner">

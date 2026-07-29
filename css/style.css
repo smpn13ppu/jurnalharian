@@ -978,7 +978,7 @@ textarea.form-control {
   inset: 0;
   background: rgba(15, 23, 42, 0.6);
   backdrop-filter: blur(4px);
-  z-index: 70;
+  z-index: 999999 !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1079,14 +1079,18 @@ textarea.form-control {
 .code-block {
   background: #0F172A;
   color: #38BDF8;
-  padding: 1rem;
+  padding: 2.5rem 1rem 1rem 1rem;
   border-radius: var(--radius-md);
-  font-family: monospace;
+  font-family: Consolas, Monaco, 'Courier New', monospace;
   font-size: 0.82rem;
+  line-height: 1.5;
+  max-height: 180px;
+  overflow-y: auto;
   overflow-x: auto;
   margin: 0.75rem 0;
   position: relative;
-  white-space: pre-wrap;
+  white-space: pre;
+  border: 1px solid #1E293B;
 }
 
 /* --- Printable Document View --- */
@@ -1393,4 +1397,423 @@ textarea.form-control {
 .kelas-chip-btn .chip-check {
   display: none;
   font-size: 0.75rem;
+}
+
+/* ========================================================================== */
+/* NATIVE MOBILE APP EXPERIENCE (KHUSUS SMARTPHONE / PHONE VIEW)              */
+/* ========================================================================== */
+
+/* Sembunyikan Bottom Nav Bar di PC / Laptop / Desktop */
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Tampilan Khusus Smartphone (Screen <= 768px) */
+@media (max-width: 768px) {
+  /* Prevent Auto-Zoom di iOS Safari saat mengklik input */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Smooth Touch Experience */
+  html, body {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Ruang Bawah Main Content agar Tidak Tertutup Bottom Nav */
+  main.main-content {
+    padding-bottom: calc(85px + env(safe-area-inset-bottom)) !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    padding-top: 1rem !important;
+  }
+
+  /* Mobile Bottom Navigation Bar (Fixed Glassmorphism) */
+  .mobile-bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9990;
+    height: calc(62px + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    justify-content: space-around;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    outline: none;
+  }
+
+  .mobile-nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .mobile-nav-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    margin-bottom: 3px;
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .mobile-nav-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    transition: color 0.2s ease;
+  }
+
+  /* Active State Bottom Nav Item */
+  .mobile-nav-item.active {
+    color: #10B981 !important;
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon {
+    transform: translateY(-2px);
+    color: #10B981;
+    filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.5));
+  }
+
+  .mobile-nav-item.active .mobile-nav-label {
+    color: #34D399;
+    font-weight: 700;
+  }
+
+  .mobile-nav-item.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 24px;
+    height: 3px;
+    background: #10B981;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 8px #10B981;
+  }
+
+  /* Compact Header Ala App Native di Mobile */
+  .main-header {
+    padding: 0.6rem 1rem !important;
+    height: auto !important;
+    min-height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+
+  .school-brand {
+    gap: 0.6rem !important;
+  }
+
+  .school-logo-badge {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .brand-text h1 {
+    font-size: 1.05rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .brand-text p {
+    font-size: 0.7rem !important;
+  }
+
+  .date-pill {
+    display: none !important; /* Disembunyikan di header mobile agar tidak padat */
+  }
+
+  .sheets-status-badge {
+    font-size: 0.72rem !important;
+    padding: 4px 8px !important;
+  }
+
+  /* Horizontal Swipeable Quick Tabs Form */
+  .quick-tabs-header {
+    display: flex !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding-bottom: 4px !important;
+    gap: 6px !important;
+  }
+
+  .quick-tabs-header::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .quick-tab-btn {
+    scroll-snap-align: start;
+    flex: 0 0 auto !important;
+    padding: 0.55rem 1rem !important;
+    font-size: 0.8rem !important;
+    border-radius: 12px !important;
+  }
+
+  /* Form & Card Touch Optimization */
+  .card, .form-container, .tab-pane {
+    border-radius: 16px !important;
+    padding: 1.1rem !important;
+  }
+
+  .btn-primary, .btn-secondary, .btn-danger, .btn-success {
+    min-height: 46px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  /* Roll Call Grid Responsiveness di Mobile */
+  .roll-call-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .student-card {
+    padding: 0.85rem !important;
+    border-radius: 14px !important;
+  }
+
+  /* Modal Bottom Sheet Look di Mobile */
+  .modal-container {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  .modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 24px 24px 0 0 !important;
+    animation: mobileSheetUp 0.3s cubic-bezier(0.32, 1.2, 0.64, 1) forwards !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  @keyframes mobileSheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+}
+
+/* ========================================================================== */
+/* BEAUTIFUL CUSTOM ALERT & CONFIRMATION MODAL                                */
+/* ========================================================================== */
+
+.custom-alert-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: rgba(2, 14, 38, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  animation: alertFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes alertFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.custom-alert-card {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 2.2rem 2rem 1.8rem;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.2) inset;
+  animation: alertPopIn 0.3s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes alertPopIn {
+  from { opacity: 0; transform: scale(0.86) translateY(20px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Icon Badge */
+.alert-icon-badge {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  position: relative;
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.alert-icon-badge.danger {
+  background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+  color: #DC2626;
+  box-shadow: 0 0 0 8px rgba(220, 38, 38, 0.12);
+}
+
+.alert-icon-badge.warning {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #D97706;
+  box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.12);
+}
+
+.alert-icon-badge.info {
+  background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+  color: #0284C7;
+  box-shadow: 0 0 0 8px rgba(2, 132, 199, 0.12);
+}
+
+.alert-icon-badge.success {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #059669;
+  box-shadow: 0 0 0 8px rgba(5, 150, 105, 0.12);
+}
+
+/* Title & Message */
+.alert-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 0.6rem;
+  line-height: 1.3;
+}
+
+.alert-message {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+  white-space: pre-line;
+}
+
+/* Prompt Container */
+.alert-prompt-container {
+  margin: 1rem 0 1.25rem;
+  text-align: left;
+  background: #F8FAFC;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid #E2E8F0;
+}
+
+.alert-prompt-label {
+  display: block;
+  font-size: 0.82rem;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.alert-prompt-input {
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #0F172A;
+  background: #ffffff;
+  border: 2px solid #CBD5E1;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.alert-prompt-input:focus {
+  border-color: #DC2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15);
+}
+
+/* Action Buttons */
+.alert-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.btn-alert-secondary {
+  flex: 1;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #475569;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-alert-secondary:hover {
+  background: #E2E8F0;
+  color: #1E293B;
+}
+
+.btn-alert-danger {
+  flex: 1;
+  padding: 0.75rem 1.2rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-alert-danger:hover {
+  background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-alert-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
 }

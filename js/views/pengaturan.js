@@ -706,32 +706,52 @@ export const PengaturanView = {
       });
     }
 
-    // 3. RESET ALL DATA HANDLER
+    // 3. RESET ALL DATA HANDLER (POPUP MODAL)
     if (btnResetAll) {
-      btnResetAll.addEventListener('click', () => {
-        const userPrompt = prompt(
-          'PERINGATAN BAHAYA:\n' +
-          'Tindakan ini akan MENGHAPUS SEMUA DATA (Jurnal, Siswa, Materi, dan Pengaturan) secara permanen!\n\n' +
-          'Ketik kata "RESET" (huruf besar) untuk melanjutkan penghapusan:'
-        );
+      btnResetAll.onclick = (e) => {
+        e.preventDefault();
+        const inputVal = document.getElementById('input-confirm-reset-text');
+        if (inputVal) inputVal.value = '';
+        window.App.openModal('modal-reset-data');
+      };
 
-        if (userPrompt === 'RESET') {
-          localStorage.removeItem('jurnalguru_settings');
-          localStorage.removeItem('jurnalguru_siswa');
-          localStorage.removeItem('jurnalguru_materi');
-          localStorage.removeItem('jurnalguru_logs');
-          localStorage.removeItem('jurnalguru_sheets_sync');
-          localStorage.removeItem('jurnalguru_dummy_purged');
+      const modalReset = document.getElementById('modal-reset-data');
+      if (modalReset) {
+        modalReset.querySelectorAll('.modal-close-btn, .btn-close-modal').forEach(btn => {
+          btn.onclick = () => window.App.closeModal('modal-reset-data');
+        });
+      }
 
-          Store.init();
-          window.App.showToast('Seluruh data berhasil di-reset ke kondisi awal pabrik!', 'success');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        } else if (userPrompt !== null) {
-          window.App.showToast('Reset dibatalkan. Kata konfirmasi tidak sesuai.', 'warning');
-        }
-      });
+      const formConfirmReset = document.getElementById('form-confirm-reset-data');
+      if (formConfirmReset) {
+        formConfirmReset.onsubmit = (e) => {
+          e.preventDefault();
+          const inputVal = document.getElementById('input-confirm-reset-text')?.value || '';
+          const cleanText = inputVal.trim().toUpperCase();
+
+          if (cleanText === 'RESET') {
+            window.App.closeModal('modal-reset-data');
+
+            // Clear all localStorage keys
+            localStorage.removeItem('jurnalguru_settings');
+            localStorage.removeItem('jurnalguru_siswa');
+            localStorage.removeItem('jurnalguru_materi');
+            localStorage.removeItem('jurnalguru_logs');
+            localStorage.removeItem('jurnalguru_sheets_sync');
+            localStorage.removeItem('jurnalguru_dummy_purged');
+
+            // Re-initialize default Store data
+            Store.init();
+
+            window.App.showToast('Seluruh data berhasil di-reset ke kondisi awal pabrik!', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 600);
+          } else {
+            window.App.showToast('Reset dibatalkan. Kata konfirmasi tidak sesuai (ketik RESET).', 'warning');
+          }
+        };
+      }
     }
   }
 };

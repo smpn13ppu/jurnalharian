@@ -282,7 +282,7 @@ export const BerandaView = {
 
   checkConnectionGuard() {
     if (!Store.isConnectedToSheets()) {
-      window.App.showToast('AKSES TERKUNCI: Database Google Sheets Belum Terhubung!', 'error');
+      window.App.showToast('Silakan hubungkan link Google Sheets Anda terlebih dahulu agar jurnal dapat tersimpan!', 'warning');
       window.App.openModal('modal-sheets-sync-guide');
       return false;
     }
@@ -407,7 +407,7 @@ export const BerandaView = {
 
     const updateHasilPagi = () => {
       const selectedKegiatan = kegiatanSelect.value || 'Kegiatan Pembiasaan Pagi';
-      hasilInput.value = `Terlaksana dengan baik kegiatan pembiasaan pagi ${selectedKegiatan} di SMPN 13 Penajam Paser Utara.`;
+      hasilInput.value = `Terlaksana dengan baik kegiatan pembiasaan pagi ${selectedKegiatan}.`;
       hasilInput.classList.add('autofill-flash');
       setTimeout(() => hasilInput.classList.remove('autofill-flash'), 800);
     };
@@ -734,7 +734,7 @@ export const BerandaView = {
 
     const updateHasilTM = () => {
       const txt = uraianInput.value || 'kegiatan tugas tambahan';
-      hasilInput.value = `Terlaksana dengan baik melakukan ${txt} di lingkungan SMPN 13 Penajam Paser Utara.`;
+      hasilInput.value = `Terlaksana dengan baik melakukan ${txt}.`;
     };
 
     uraianInput.addEventListener('input', updateHasilTM);
@@ -851,7 +851,7 @@ export const BerandaView = {
     const updateHasilIstirahat = () => {
       const selectedKegiatan = kegiatanSelect?.value || 'Istirahat KBM';
       if (hasilInput) {
-        hasilInput.value = `Jeda aktivitas KBM dan melakukan ${selectedKegiatan} di SMPN 13 Penajam Paser Utara.`;
+        hasilInput.value = `Jeda aktivitas KBM dan melakukan ${selectedKegiatan}.`;
       }
     };
 
@@ -952,7 +952,7 @@ export const BerandaView = {
     const updateHasilPulang = () => {
       const selectedOpsi = opsiSelect?.value || 'Refleksi & Doa Bersama';
       if (hasilInput) {
-        hasilInput.value = `Terlaksana dengan baik kegiatan ${selectedOpsi} sebelum jam pulang sekolah di SMPN 13 Penajam Paser Utara.`;
+        hasilInput.value = `Terlaksana dengan baik kegiatan ${selectedOpsi} sebelum jam pulang sekolah.`;
       }
     };
 

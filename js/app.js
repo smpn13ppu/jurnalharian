@@ -42,6 +42,9 @@ window.App = {
     this.initHeader();
     this.initModalListeners();
 
+    // Render Apps Script Code Snippet on startup
+    try { PengaturanView.renderAppsScriptCodeSnippet(); } catch (e) {}
+
     // Render default view
     this.switchView('beranda');
 
@@ -245,7 +248,12 @@ window.App = {
 
   openModal(modalId) {
     const modal = document.getElementById(modalId);
-    if (modal) modal.classList.add('open');
+    if (modal) {
+      if (modalId === 'modal-sheets-sync-guide') {
+        try { PengaturanView.renderAppsScriptCodeSnippet(); } catch (e) {}
+      }
+      modal.classList.add('open');
+    }
   },
 
   closeModal(modalId) {
