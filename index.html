@@ -1313,11 +1313,12 @@
         <h4 style="margin-bottom:0.5rem; color:var(--primary-navy);">Langkah 2: Salin Kode Google Apps Script</h4>
         <p style="font-size:0.88rem; margin-bottom:0.5rem;">Klik menu <strong>Extensions &gt; Apps Script</strong> pada
           Google Sheets Anda, lalu salin dan tempelkan kode berikut:</p>
-        <div style="position:relative;">
+        <div class="code-block-wrapper">
+          <div class="code-block-bar">
+            <span><i class="fas fa-code"></i> Kode Apps Script</span>
+            <button id="btn-copy-script-code" type="button" class="btn-copy-code"><i class="fas fa-copy"></i> Copy Kode</button>
+          </div>
           <pre id="apps-script-code-snippet" class="code-block"></pre>
-          <button id="btn-copy-script-code" class="btn-secondary"
-            style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.75rem;"><i
-              class="fas fa-copy"></i> Copy Kode</button>
         </div>
 
         <h4 style="margin-bottom:0.5rem; margin-top:1.25rem; color:var(--primary-navy);">Langkah 3: Deploy sebagai Web
