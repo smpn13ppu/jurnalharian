@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JurnalGuru Pro - SMP NEGERI 13 Penajam Paser Utara</title>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Application Design System CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- SheetJS Library for Excel Import & Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+  <div id="app-container">
+    <!-- Navbar / Header Glassmorphism -->
+    <header class="main-header">
+      <div class="header-left">
+        <button id="burger-menu-btn" class="burger-btn" aria-label="Buka Menu Navigasi" title="Buka Menu Navigasi">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="school-brand">
+          <div class="school-logo-badge">13</div>
+          <div class="brand-text">
+            <h1>JurnalGuru Pro</h1>
+            <p>SMP NEGERI 13 Penajam Paser Utara</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div id="header-date-pill" class="date-pill">
+          <i class="far fa-calendar-alt"></i> <span>Rabu, 29 Juli 2026</span>
+        </div>
+        <div id="header-sheets-badge" class="sheets-status-badge offline"
+          title="Klik untuk Pengaturan Sync Google Sheets">
+          <span class="status-dot"></span>
+          <span>Sheets Offline</span>
+        </div>
+        <button id="btn-header-switch-db" class="btn-secondary"
+          style="font-size:0.78rem; padding: 0.4rem 0.8rem; display:none;" title="Putuskan Database & Ganti Akun Guru">
+          <i class="fas fa-right-from-bracket"></i> <span>Ganti Database</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Floating Drawer Navigation (Left Sidebar) -->
+    <div id="drawer-overlay" class="drawer-overlay">
+      <nav class="drawer-sidebar">
+        <div class="drawer-header">
+          <div class="drawer-title">
+            <i class="fas fa-graduation-cap" style="color: var(--primary-emerald-hover); font-size: 1.4rem;"></i>
+            <h2>Menu Navigasi</h2>
+          </div>
+          <button id="drawer-close-btn" class="drawer-close-btn" aria-label="Tutup Menu">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="drawer-menu">
+          <button class="menu-item active" data-view="beranda">
+            <i class="fas fa-home"></i> <span>Beranda (Quick Entry)</span>
+          </button>
+          <button class="menu-item" data-view="dashboard">
+            <i class="fas fa-chart-pie"></i> <span>Dashboard Analytics</span>
+          </button>
+          <button class="menu-item" data-view="jurnal-mengajar">
+            <i class="fas fa-book-open"></i> <span>Jurnal Mengajar KBM</span>
+          </button>
+          <button class="menu-item" data-view="jurnal-mingguan">
+            <i class="fas fa-calendar-check"></i> <span>Jurnal 37.5 Jam / Minggu</span>
+          </button>
+          <button class="menu-item" data-view="rekap-absen">
+            <i class="fas fa-user-check"></i> <span>Rekap Absensi Siswa</span>
+          </button>
+          <button class="menu-item" data-view="siswa">
+            <i class="fas fa-users"></i> <span>Master Data Siswa</span>
+          </button>
+          <button class="menu-item" data-view="materi">
+            <i class="fas fa-layer-group"></i> <span>Master Data Materi</span>
+          </button>
+          <button class="menu-item" data-view="pengaturan">
+            <i class="fas fa-cog"></i> <span>Pengaturan & Sheets Sync</span>
+          </button>
+        </div>
+
+        <div class="drawer-footer">
+          <p><strong>JurnalGuru Pro v1.0.0</strong></p>
+          <p>Terintegrasi Permendikbudristek 37.5 Jam</p>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ===================================================================
+           VIEW 1: BERANDA (QUICK ENTRY FORM SYSTEM)
+           =================================================================== -->
+      <section id="view-beranda" class="view-section active">
+        <div class="section-header-banner"
+          style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <div class="banner-info" style="flex:1; min-width:280px;">
+            <h2>Pengisian Jurnal Harian &amp; Beban Kerja Guru</h2>
+            <p>Single Point of Entry: Entri cepat kegiatan harian &amp; absensi siswa tanpa double-entry.</p>
+          </div>
+          <div id="beranda-workload-badge" class="workload-summary-pill"
+            style="background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25); padding: 0.75rem 1.25rem; border-radius: 12px; color: #FFFFFF; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <i class="fas fa-clock" style="font-size: 1.5rem; color: #FCD34D;"></i>
+            <div>
+              <div
+                style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9; font-weight: 600;">
+                Jam Kerja Terisi (Minggu Ini)</div>
+              <div style="font-size: 1.25rem; font-weight: 800; line-height: 1.2;" id="beranda-jam-terisi-text">0 / 37,5
+                Jam (0%)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connection Guard Lock Banner (Tampil Jika Google Sheets Belum Terhubung) -->
+        <div id="connection-guard-banner" class="connection-guard-banner" style="display:none;">
+          <div class="guard-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div class="guard-info">
+            <h4>Akses Terkunci: Database Google Sheets Belum Terhubung!</h4>
+            <p>Untuk digunakan oleh banyak guru secara terpusat, aplikasi ini mewajibkan koneksi ke database Google
+              Sheets sekolah terlebih dahulu. Pengisian jurnal hanya dapat dilakukan setelah Google Sheets terhubung.
+            </p>
+          </div>
+          <button class="btn-primary" onclick="window.App.openModal('modal-sheets-sync-guide')">
+            <i class="fas fa-plug"></i> Hubungkan Google Sheets
+          </button>
+        </div>
+
+        <!-- Quick Entry Tabbed System -->
+        <div class="quick-entry-container">
+          <div class="quick-tabs-nav">
+            <button class="quick-tab-btn active" data-tab="tab-pagi">
+              <i class="fas fa-sun"></i> <span>PAGI</span>
+            </button>
+            <button class="quick-tab-btn" data-tab="tab-mengajar">
+              <i class="fas fa-chalkboard-teacher"></i> <span>MENGAJAR</span>
+            </button>
+            <button class="quick-tab-btn" data-tab="tab-tidak-mengajar">
+              <i class="fas fa-clipboard-list"></i> <span>TIDAK MENGAJAR</span>
+            </button>
+            <button class="quick-tab-btn" data-tab="tab-istirahat">
+              <i class="fas fa-mug-hot"></i> <span>ISTIRAHAT</span>
+            </button>
+            <button class="quick-tab-btn" data-tab="tab-pulang">
+              <i class="fas fa-door-open"></i> <span>JAM PULANG</span>
+            </button>
+          </div>
+
+          <!-- TAB 1: PAGI -->
+          <div id="tab-pagi" class="tab-pane active">
+            <form id="form-pagi">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="far fa-calendar-alt"></i> Tanggal</label>
+                  <input type="date" id="pagi-tanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Mulai</label>
+                  <select id="pagi-waktu-mulai" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Selesai</label>
+                  <select id="pagi-waktu-selesai" class="form-control" required></select>
+                </div>
+                <div class="form-group full-width">
+                  <label><i class="fas fa-tasks"></i> Opsi Kegiatan Pagi</label>
+                  <select id="pagi-kegiatan" class="form-control" required></select>
+                </div>
+              </div>
+              <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+                <label><i class="fas fa-magic"></i> Hasil / Deskripsi Uraian Otomatis</label>
+                <input type="text" id="pagi-hasil" class="form-control" required>
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Simpan Entri Pagi
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB 2: MENGAJAR (Roll Call & KBM) -->
+          <div id="tab-mengajar" class="tab-pane">
+            <form id="form-mengajar">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="far fa-calendar-alt"></i> Tanggal KBM</label>
+                  <input type="date" id="mengajar-tanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Mulai</label>
+                  <select id="mengajar-jam-mulai" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Selesai</label>
+                  <select id="mengajar-jam-selesai" class="form-control" required></select>
+                </div>
+              </div>
+
+              <div class="form-group full-width" style="margin-bottom:1rem;">
+                <label><i class="fas fa-door-open"></i> Pilih Kelas <span
+                    style="font-size:0.75rem; color:var(--text-muted); font-weight:400;">(bisa pilih lebih dari
+                    satu)</span></label>
+                <div id="mengajar-kelas-chips" class="kelas-chips-container">
+                  <p class="text-muted" style="font-size:0.85rem; padding:0.5rem 0;">Memuat data kelas...</p>
+                </div>
+                <!-- Hidden input to store selected values for validation -->
+                <input type="hidden" id="mengajar-kelas" required>
+              </div>
+
+              <div class="form-group full-width" style="margin-bottom:1rem;">
+                <label><i class="fas fa-book"></i> Materi / Topik Pembelajaran</label>
+                <select id="mengajar-materi" class="form-control" required>
+                  <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+                </select>
+              </div>
+
+              <!-- Interactive Roll-Call Grid -->
+              <div class="roll-call-section">
+                <div class="roll-call-header">
+                  <h4><i class="fas fa-clipboard-user" style="color:var(--primary-emerald);"></i> Roll-Call Kehadiran
+                    Siswa (Presensi Interaktif)</h4>
+                  <div class="roll-call-stats">
+                    <span id="stat-cnt-h" class="stat-pill h">H: 0</span>
+                    <span id="stat-cnt-s" class="stat-pill s">S: 0</span>
+                    <span id="stat-cnt-i" class="stat-pill i">I: 0</span>
+                    <span id="stat-cnt-a" class="stat-pill a">A: 0</span>
+                  </div>
+                </div>
+                <div id="roll-call-grid" class="roll-call-grid">
+                  <p class="text-muted" style="grid-column:1/-1; text-align:center; padding: 2rem;">Pilih kelas di atas
+                    untuk memuat daftar nama siswa.</p>
+                </div>
+              </div>
+
+              <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+                <label><i class="far fa-edit"></i> Catatan Kejadian KBM (Opsional)</label>
+                <textarea id="mengajar-catatan" class="form-control"
+                  placeholder="Contoh: Diskusi kelompok berjalan antusias, lembar praktikum dikumpulkan tepat waktu."></textarea>
+              </div>
+
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-check-circle"></i> Simpan Jurnal Mengajar & Roll-Call
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB 3: TIDAK MENGAJAR -->
+          <div id="tab-tidak-mengajar" class="tab-pane">
+            <form id="form-tidak-mengajar">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="far fa-calendar-alt"></i> Tanggal</label>
+                  <input type="date" id="tm-tanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Jam Mulai</label>
+                  <select id="tm-jam-mulai" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Jam Selesai</label>
+                  <select id="tm-jam-selesai" class="form-control" required></select>
+                </div>
+              </div>
+              <div class="form-group full-width">
+                <label><i class="fas fa-align-left"></i> Uraian Detail Kegiatan (Tugas Tambahan/Aparatur)</label>
+                <textarea id="tm-uraian" class="form-control"
+                  placeholder="Contoh: Mengoreksi hasil evaluasi belajar siswa, menyusun modul ajar interaktif, rapat koordinasi MGMP."
+                  required></textarea>
+              </div>
+              <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+                <label><i class="fas fa-magic"></i> Hasil / Output Kegiatan (Auto-Filled / Editable)</label>
+                <input type="text" id="tm-hasil" class="form-control" required>
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Simpan Tugas Tambahan
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB 4: ISTIRAHAT -->
+          <div id="tab-istirahat" class="tab-pane">
+            <form id="form-istirahat">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="far fa-calendar-alt"></i> Tanggal</label>
+                  <input type="date" id="ist-tanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="fas fa-coffee"></i> Pilih Slot Istirahat</label>
+                  <select id="ist-select-slot" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Istirahat</label>
+                  <input type="text" id="ist-waktu" class="form-control" readonly>
+                </div>
+                <div class="form-group full-width">
+                  <label><i class="fas fa-tasks"></i> Variasi Kegiatan Istirahat</label>
+                  <select id="ist-kegiatan-select" class="form-control" required></select>
+                </div>
+              </div>
+              <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+                <label><i class="fas fa-magic"></i> Hasil Otomatis</label>
+                <input type="text" id="ist-hasil" class="form-control" required>
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Simpan Jurnal Istirahat
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB 5: JAM PULANG -->
+          <div id="tab-pulang" class="tab-pane">
+            <form id="form-pulang">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label><i class="far fa-calendar-alt"></i> Tanggal</label>
+                  <input type="date" id="plg-tanggal" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Mulai</label>
+                  <select id="plg-waktu-mulai" class="form-control" required></select>
+                </div>
+                <div class="form-group">
+                  <label><i class="far fa-clock"></i> Waktu Selesai</label>
+                  <select id="plg-waktu-selesai" class="form-control" required></select>
+                </div>
+                <div class="form-group full-width">
+                  <label><i class="fas fa-door-closed"></i> Opsi Kegiatan Sebelum Pulang</label>
+                  <select id="plg-opsi" class="form-control" required></select>
+                </div>
+              </div>
+              <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+                <label><i class="fas fa-magic"></i> Hasil Otomatis</label>
+                <input type="text" id="plg-hasil" class="form-control" required>
+              </div>
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> Simpan Jurnal Pulang
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- PREVIEW JURNAL HARIAN DI BERANDA (STANDALONE DISTINCT CARD CONTAINER) -->
+        <div class="data-card"
+          style="margin-top: 2.25rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+          <div
+            style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom: 1.25rem;">
+            <h4
+              style="margin:0; color:var(--primary-navy); display:flex; align-items:center; gap:8px; font-size: 1.1rem;">
+              <i class="fas fa-list-check" style="color:var(--primary-emerald);"></i> Preview Jurnal &amp; Beban Kerja
+              Harian
+            </h4>
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <button type="button" id="btn-delete-selected-beranda-logs" class="btn-danger"
+                style="padding: 6px 14px; font-size: 0.85rem; display: none;" disabled>
+                <i class="fas fa-trash-alt"></i> Hapus Terseleksi (<span id="cnt-selected-beranda-logs">0</span>)
+              </button>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:0.85rem; font-weight:600; color:var(--text-secondary); margin:0;">Filter
+                  Tanggal:</label>
+                <input type="date" id="beranda-preview-date" class="form-control"
+                  style="width: auto; padding: 6px 12px; font-size:0.85rem;">
+              </div>
+            </div>
+          </div>
+
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:40px; text-align:center;">
+                    <input type="checkbox" id="chk-select-all-beranda-logs" title="Tandai Semua">
+                  </th>
+                  <th style="width:50px;">NO</th>
+                  <th style="width:110px;">TANGGAL</th>
+                  <th style="width:120px;">WAKTU</th>
+                  <th style="width:130px;">KATEGORI</th>
+                  <th>KEGIATAN &amp; URAIAN HASIL</th>
+                  <th style="width:100px;">DURASI</th>
+                  <th style="width:70px; text-align:center;">AKSI</th>
+                </tr>
+              </thead>
+              <tbody id="beranda-preview-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 2: DASHBOARD ANALYTICS
+           =================================================================== -->
+      <section id="view-dashboard" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Dashboard Informasi & Metrics Beban Kerja</h2>
+            <p>Monitor kumulatif target jam kerja 37.5 Jam/Minggu & statistik KBM sekolah.</p>
+          </div>
+        </div>
+
+        <!-- 37.5 Hours Workload Card -->
+        <div class="workload-tracker-card">
+          <div class="workload-header">
+            <h3><i class="fas fa-tachometer-alt" style="color:var(--primary-emerald);"></i> Progress Akumulasi Beban
+              Kerja Mingguan</h3>
+            <span id="workload-badge-status" class="workload-badge progress">
+              <i class="fas fa-spinner fa-spin"></i> DALAM PROSES
+            </span>
+          </div>
+
+          <div class="workload-progress-bar-track">
+            <div id="workload-bar-fill" class="workload-progress-bar-fill"></div>
+          </div>
+
+          <div class="workload-metrics-info">
+            <span id="workload-week-range">Periode: -</span>
+            <span id="workload-display-time" style="color:var(--primary-navy); font-weight:800;">0 Jam / 37,5 Jam
+              (0%)</span>
+          </div>
+        </div>
+
+        <!-- Analytics Metric Cards -->
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <div class="stat-icon-wrapper emerald"><i class="fas fa-chalkboard-teacher"></i></div>
+            <div class="stat-details">
+              <h3 id="stat-cnt-mengajar">0 Sesi</h3>
+              <p>Total Sesi Jurnal Mengajar</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper blue"><i class="fas fa-user-graduate"></i></div>
+            <div class="stat-details">
+              <h3 id="stat-cnt-siswa">0 Siswa</h3>
+              <p>Siswa Terdaftar (Kelas 7-9)</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper amber"><i class="fas fa-book-open"></i></div>
+            <div class="stat-details">
+              <h3 id="stat-cnt-materi">0 Modul</h3>
+              <p>Modul Materi Pembelajaran</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrapper navy"><i class="fas fa-history"></i></div>
+            <div class="stat-details">
+              <h3 id="stat-cnt-total-log">0 Entri</h3>
+              <p>Total Log Aktivitas Harian</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Logs Table -->
+        <div class="table-card">
+          <div class="table-toolbar">
+            <h4><i class="fas fa-clock-rotate-left"></i> Entri Aktivitas Terbaru</h4>
+            <button class="btn-secondary" onclick="window.App.switchView('jurnal-mengajar')">Lihat Semua Log</button>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Tanggal</th>
+                  <th>Kategori</th>
+                  <th>Kegiatan / Materi</th>
+                  <th>Hasil Uraian</th>
+                </tr>
+              </thead>
+              <tbody id="recent-logs-tbody">
+                <tr>
+                  <td colspan="5" style="text-align:center; padding: 2rem;" class="text-muted">Memuat aktivitas...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 3: JURNAL MENGAJAR (LOG KBM)
+           =================================================================== -->
+      <section id="view-jurnal-mengajar" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Laporan Jurnal Mengajar Harian (KBM)</h2>
+            <p>Rekapitulasi aktivitas belajar mengajar, durasi JP, dan catatan kehadiran siswa.</p>
+          </div>
+          <div class="toolbar-right">
+            <button id="btn-export-jm-excel" class="btn-secondary"><i class="fas fa-file-excel"></i> Export
+              Excel</button>
+            <button id="btn-export-jm-pdf" class="btn-primary"><i class="fas fa-print"></i> Cetak PDF</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <input type="date" id="jm-filter-tgl-start" class="form-control" style="width:160px;">
+              <span>s.d.</span>
+              <input type="date" id="jm-filter-tgl-end" class="form-control" style="width:160px;">
+              <select id="jm-filter-kelas" class="form-control" style="width:140px;">
+                <option value="">Semua Kelas</option>
+                <option value="7">Kelas 7</option>
+                <option value="8">Kelas 8</option>
+                <option value="9">Kelas 9</option>
+              </select>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Tanggal</th>
+                  <th>Jam / Durasi</th>
+                  <th>Kelas</th>
+                  <th>Materi / Topik</th>
+                  <th>Catatan Absensi Siswa</th>
+                  <th>Hasil Uraian</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="jurnal-mengajar-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 4: JURNAL MINGGUAN (BEBAN KERJA 37.5 JAM & PRINT SETUP)
+           =================================================================== -->
+      <section id="view-jurnal-mingguan" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Jurnal Mingguan Integrasi Beban Kerja (37.5 Jam)</h2>
+            <p>Laporan resmi administrasi pegawai dengan parameter cetak custom & tanda tangan.</p>
+          </div>
+          <div class="toolbar-right">
+            <button id="btn-export-jm-mingguan-excel" class="btn-secondary"><i class="fas fa-file-excel"></i> Export
+              Excel</button>
+            <button id="btn-print-jurnal-mingguan" class="btn-primary"><i class="fas fa-print"></i> Cetak PDF
+              Laporan</button>
+          </div>
+        </div>
+
+        <!-- Custom Print Setup Form -->
+        <div class="print-setup-box">
+          <h4><i class="fas fa-sliders"></i> Parameter Form Pengaturan Cetak (Print Setup)</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Tanggal Mulai Mingguan</label>
+              <input type="date" id="jm-print-tgl-start" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Tanggal Akhir Mingguan</label>
+              <input type="date" id="jm-print-tgl-end" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Nama Guru</label>
+              <input type="text" id="jm-print-nama-guru" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>NIP Guru</label>
+              <input type="text" id="jm-print-nip-guru" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Nama Kepala Sekolah</label>
+              <input type="text" id="jm-print-nama-kepsek" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>NIP Kepala Sekolah</label>
+              <input type="text" id="jm-print-nip-kepsek" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>Tempat Cetak</label>
+              <input type="text" id="jm-print-tempat" class="form-control" value="Penajam">
+            </div>
+            <div class="form-group">
+              <label>Tanggal Cetak</label>
+              <input type="date" id="jm-print-tgl-cetak" class="form-control">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-arrows-alt-v"></i> Orientasi Kertas Cetak (PDF)</label>
+              <select id="jm-print-orientasi" class="form-control">
+                <option value="portrait">Vertikal (Portrait / Tegak)</option>
+                <option value="landscape">Horizontal (Landscape / Mendatar)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top: 1.25rem; display: flex; justify-content: flex-end;">
+            <button type="button" id="btn-save-print-setup" class="btn-primary">
+              <i class="fas fa-save"></i> Simpan Pengaturan Cetak
+            </button>
+          </div>
+        </div>
+
+        <!-- Printable View Container -->
+        <div id="printable-report-area">
+          <div id="official-print-header-view" class="official-print-header"></div>
+
+          <div class="table-card">
+            <div class="data-table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Hari & Tanggal</th>
+                    <th>Rentang Waktu</th>
+                    <th>Kegiatan</th>
+                    <th>Uraian Detail Kegiatan</th>
+                    <th>Durasi</th>
+                    <th>Hasil</th>
+                  </tr>
+                </thead>
+                <tbody id="jurnal-mingguan-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="jurnal-mingguan-footer"></div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 5: REKAP ABSEN SISWA
+           =================================================================== -->
+      <section id="view-rekap-absen" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Matrix Rekapitulasi Kehadiran Siswa</h2>
+            <p>Rekap absensi bulanan/semesteran per kelas dengan visual color badges.</p>
+          </div>
+          <div class="toolbar-right">
+            <button id="btn-export-ra-excel" class="btn-secondary"><i class="fas fa-file-excel"></i> Export
+              Excel</button>
+            <button id="btn-export-ra-pdf" class="btn-primary"><i class="fas fa-print"></i> Cetak PDF</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <label style="font-weight:600;">Kelas:</label>
+              <select id="ra-filter-kelas" class="form-control" style="width:140px;"></select>
+              <label style="font-weight:600; margin-left:1rem;">Bulan:</label>
+              <input type="month" id="ra-filter-bulan" class="form-control" style="width:180px;">
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table id="rekap-absen-table" class="data-table matrix-table"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 6: MASTER DATA SISWA
+           =================================================================== -->
+      <section id="view-siswa" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Master Data Siswa SMPN 13 PPU</h2>
+            <p>Pengelolaan data siswa per kelas, pencarian NISN, dan impor dari file Excel.</p>
+          </div>
+          <div class="toolbar-right">
+            <button id="btn-import-excel" class="btn-secondary"><i class="fas fa-file-import"></i> Import Excel</button>
+            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="display:none;">
+            <button id="btn-add-siswa" class="btn-primary"><i class="fas fa-user-plus"></i> Tambah Siswa</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <select id="siswa-filter-kelas" class="form-control" style="width:160px;"></select>
+            </div>
+            <div class="toolbar-right">
+              <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="siswa-search-input" class="form-control" placeholder="Cari nama / NISN...">
+              </div>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>NISN</th>
+                  <th>Nama Lengkap</th>
+                  <th>Kelas</th>
+                  <th>Jenis Kelamin</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="siswa-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 7: MASTER DATA MATERI
+           =================================================================== -->
+      <section id="view-materi" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Master Data Modul & Materi Pembelajaran</h2>
+            <p>Pemetaan Kurikulum, Bab, dan Topik KBM untuk Tingkatan Kelas 7, 8, dan 9.</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button id="btn-add-materi" class="btn-primary"><i class="fas fa-plus"></i> Tambah Modul Materi</button>
+            <button id="btn-import-materi-excel" class="btn-secondary"
+              style="background:#10B981; color:#FFF; border:none;"><i class="fas fa-file-excel"></i> Import Excel /
+              CSV</button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-toolbar">
+            <div class="toolbar-left">
+              <select id="materi-filter-kelas" class="form-control" style="width:160px;">
+                <option value="">Semua Tingkat</option>
+                <option value="7">Kelas 7</option>
+                <option value="8">Kelas 8</option>
+                <option value="9">Kelas 9</option>
+              </select>
+            </div>
+          </div>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Tingkat</th>
+                  <th>Mata Pelajaran</th>
+                  <th>Topik Pembelajaran</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="materi-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           VIEW 8: PENGATURAN & GOOGLE SHEETS SYNC
+           =================================================================== -->
+      <section id="view-pengaturan" class="view-section">
+        <div class="section-header-banner">
+          <div class="banner-info">
+            <h2>Pengaturan Sistem & Database Google Sheets</h2>
+            <p>Konfigurasi profil sekolah, nama guru/kepsek, dan integrasi Google Sheets API.</p>
+          </div>
+          <button id="btn-open-sync-modal" class="btn-primary"><i class="fas fa-link"></i> Panduan Sync Google
+            Sheets</button>
+        </div>
+
+        <!-- Sub-Tabs Navigasi Pengaturan -->
+        <div class="quick-entry-container" style="margin-bottom:1.5rem;">
+          <div class="quick-tabs-nav">
+            <button class="quick-tab-btn set-tab-btn active" data-set-tab="set-tab-umum">
+              <i class="fas fa-sliders"></i> <span>1. Profil &amp; Database</span>
+            </button>
+            <button class="quick-tab-btn set-tab-btn" data-set-tab="set-tab-kegiatan">
+              <i class="fas fa-calendar-alt"></i> <span>2. Pengaturan Kegiatan</span>
+            </button>
+            <button class="quick-tab-btn set-tab-btn" data-set-tab="set-tab-backup">
+              <i class="fas fa-database"></i> <span>3. Backup &amp; Reset</span>
+            </button>
+          </div>
+
+          <!-- SUB-TAB 1: PROFIL & DATABASE -->
+          <div id="set-tab-umum" class="tab-pane active" style="padding: 1.5rem;">
+            <h4 style="margin-bottom:1.25rem; color:var(--primary-navy);"><i class="fas fa-building-columns"></i> Profil
+              Sekolah &amp; Pejabat Penandatangan</h4>
+            <form id="form-pengaturan-umum">
+              <div class="form-grid">
+                <div class="form-group full-width">
+                  <label>Nama Satuan Pendidikan</label>
+                  <input type="text" id="set-sekolah" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Nama Guru</label>
+                  <input type="text" id="set-nama-guru" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>NIP Guru</label>
+                  <input type="text" id="set-nip-guru" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Nama Kepala Sekolah</label>
+                  <input type="text" id="set-nama-kepsek" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>NIP Kepala Sekolah</label>
+                  <input type="text" id="set-nip-kepsek" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label>Tempat Cetak (Kota/Kabupaten)</label>
+                  <input type="text" id="set-tempat-cetak" class="form-control" value="Penajam" required>
+                </div>
+                <div class="form-group full-width">
+                  <label><i class="fab fa-google-drive"></i> Google Apps Script Web App URL (Database
+                    Integration)</label>
+                  <input type="url" id="set-script-url" class="form-control"
+                    placeholder="https://script.google.com/macros/s/.../exec">
+                  <small class="text-muted">Masukkan Web App URL dari Google Apps Script untuk menghubungkan Google
+                    Sheets sebagai database.</small>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;">
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan Profil</button>
+                <button type="button" id="btn-test-sheets-conn" class="btn-secondary"><i class="fas fa-plug"></i> Uji
+                  Koneksi Sheets</button>
+                <button type="button" id="btn-push-sheets-now" class="btn-secondary"><i class="fas fa-sync"></i>
+                  Sinkronkan Sekarang</button>
+                <button type="button" id="btn-disconnect-sheets" class="btn-danger"><i
+                    class="fas fa-right-from-bracket"></i> Putuskan Database &amp; Ganti Guru</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- SUB-TAB 2: PENGATURAN KEGIATAN (TERINTEGRASI PAGI, ISTIRAHAT, & PULANG) -->
+          <div id="set-tab-kegiatan" class="tab-pane" style="padding: 1.5rem;">
+            <!-- CARD 1: KEGIATAN PAGI RUTIN -->
+            <div
+              style="background:#FFFFFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.75rem;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+                <h4 style="color:var(--primary-navy); margin:0;">
+                  <span class="badge" style="background:#CCFBF1; color:#0F766E; margin-right:6px;">3</span> Kegiatan
+                  Pagi Rutin
+                </h4>
+                <!-- Day Pill Selector -->
+                <div class="pill-selector-group" id="pagi-day-pills">
+                  <button type="button" class="pill-btn active" data-pagi-day="Senin">SEN</button>
+                  <button type="button" class="pill-btn" data-pagi-day="Selasa">SEL</button>
+                  <button type="button" class="pill-btn" data-pagi-day="Rabu">RAB</button>
+                  <button type="button" class="pill-btn" data-pagi-day="Kamis">KAM</button>
+                  <button type="button" class="pill-btn" data-pagi-day="Jumat">JUM</button>
+                </div>
+              </div>
+
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
+                <span
+                  style="font-weight:700; font-size:0.85rem; color:var(--primary-emerald); text-transform:uppercase;"
+                  id="pagi-config-title">KONFIGURASI HARI SENIN</span>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:1.25rem;">
+                <div class="form-group">
+                  <label
+                    style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">JAM
+                    MULAI</label>
+                  <select id="set-pagi-jam-mulai" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                  <label
+                    style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">JAM
+                    SELESAI</label>
+                  <select id="set-pagi-jam-selesai" class="form-control"></select>
+                </div>
+              </div>
+
+              <div style="margin-bottom:1.5rem;">
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.5rem;">BANK
+                  DATA VARIASI KEGIATAN PENGGANTI</label>
+                <div class="tag-input-wrapper">
+                  <input type="text" id="set-pagi-tag-input" class="form-control"
+                    placeholder="Tambah variasi kegiatan... (Pisahkan dengan Enter atau tombol +)">
+                  <button type="button" id="btn-add-pagi-tag" class="btn-primary" style="padding: 0.6rem 1rem;"><i
+                      class="fas fa-plus"></i></button>
+                  <button type="button" id="btn-clear-pagi-tags" class="btn-danger" style="padding: 0.6rem 1rem;"
+                    title="Hapus Semua Tags"><i class="fas fa-trash"></i></button>
+                </div>
+                <div id="pagi-tags-container" class="tag-chips-container"></div>
+              </div>
+
+              <button type="button" id="btn-save-pagi-config" class="btn-primary"
+                style="background:var(--primary-emerald);">
+                <i class="fas fa-save"></i> SIMPAN KEGIATAN PAGI (<span id="pagi-btn-day-label">SENIN</span>)
+              </button>
+            </div>
+            <!-- CARD 1: JAM ISTIRAHAT -->
+            <div
+              style="background:#FFFFFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.75rem;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+                <h4 style="color:var(--primary-navy); margin:0;">
+                  <span class="badge" style="background:#CCFBF1; color:#0F766E; margin-right:6px;">4A</span> Jam
+                  Istirahat (Beban Kerja Istirahat)
+                </h4>
+                <div class="pill-selector-group" id="ist-mode-pills">
+                  <button type="button" class="pill-btn active" data-ist-mode="biasa">Hari Biasa</button>
+                  <button type="button" class="pill-btn" data-ist-mode="jumat">Hari Jumat</button>
+                </div>
+              </div>
+
+              <span
+                style="font-weight:700; font-size:0.85rem; color:var(--primary-emerald); text-transform:uppercase; display:block; margin-bottom:0.75rem;"
+                id="ist-config-title">TAMBAH JAM ISTIRAHAT (HARI BIASA)</span>
+
+              <div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap;">
+                <input type="text" id="set-ist-name-input" class="form-control"
+                  placeholder="Nama Istirahat, misal: Istirahat 1" style="flex:2; min-width:200px;">
+                <select id="set-ist-start-input" class="form-control" style="width:130px;"></select>
+                <span style="font-size:0.85rem; color:var(--text-muted);">s/d</span>
+                <select id="set-ist-end-input" class="form-control" style="width:130px;"></select>
+                <button type="button" id="btn-add-ist-slot" class="btn-primary" style="white-space:nowrap;"><i
+                    class="fas fa-plus"></i> TAMBAH</button>
+              </div>
+
+              <!-- Table list of Istirahat items -->
+              <div class="data-table-wrapper">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width:60px;">URUTAN</th>
+                      <th style="width:140px;">NAMA</th>
+                      <th style="width:200px;">WAKTU (MULAI S/D SELESAI)</th>
+                      <th>VARIASI LAPORAN KERJA PENGAWASAN</th>
+                      <th style="width:90px;">AKSI</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ist-table-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- CARD 2: SEBELUM PULANG -->
+            <div
+              style="background:#FFFFFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem;">
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap; gap:1rem;">
+                <h4 style="color:var(--primary-navy); margin:0;">
+                  <span class="badge" style="background:#CCFBF1; color:#0F766E; margin-right:6px;">3</span> Sebelum
+                  Pulang
+                </h4>
+                <div class="pill-selector-group" id="plg-mode-pills">
+                  <button type="button" class="pill-btn active" data-plg-mode="biasa">Hari Biasa</button>
+                  <button type="button" class="pill-btn" data-plg-mode="jumat">Hari Jumat</button>
+                </div>
+              </div>
+
+              <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap;">
+                <span
+                  style="font-weight:700; font-size:0.85rem; color:var(--primary-emerald); text-transform:uppercase;"
+                  id="plg-config-title">KONFIGURASI PULANG (HARI BIASA)</span>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:1.25rem;">
+                <div class="form-group">
+                  <label
+                    style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">JAM
+                    MULAI</label>
+                  <select id="set-plg-jam-mulai" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                  <label
+                    style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted);">JAM
+                    SELESAI</label>
+                  <select id="set-plg-jam-selesai" class="form-control"></select>
+                </div>
+              </div>
+
+              <div style="margin-bottom:1.5rem;">
+                <label
+                  style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--text-muted); display:block; margin-bottom:0.5rem;">BANK
+                  DATA VARIASI KEGIATAN SEBELUM PULANG</label>
+                <div class="tag-input-wrapper">
+                  <input type="text" id="set-plg-tag-input" class="form-control"
+                    placeholder="Tambah variasi kegiatan... (Pisahkan dengan Enter atau tombol +)">
+                  <button type="button" id="btn-add-plg-tag" class="btn-primary" style="padding: 0.6rem 1rem;"><i
+                      class="fas fa-plus"></i></button>
+                  <button type="button" id="btn-clear-plg-tags" class="btn-danger" style="padding: 0.6rem 1rem;"
+                    title="Hapus Semua Tags"><i class="fas fa-trash"></i></button>
+                </div>
+                <div id="plg-tags-container" class="tag-chips-container"></div>
+              </div>
+
+              <button type="button" id="btn-save-plg-config" class="btn-primary"
+                style="background:var(--primary-emerald);">
+                <i class="fas fa-save"></i> SIMPAN KONFIGURASI PULANG (<span id="plg-btn-mode-label">HARI BIASA</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- SUB-TAB 3: BACKUP, RESTORE & RESET DATA -->
+          <div id="set-tab-backup" class="tab-pane" style="padding: 1.5rem;">
+
+            <!-- SECTION 1: BACKUP DATA -->
+            <div
+              style="background:#FFFFFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.75rem;">
+              <h4 style="color:var(--primary-navy); margin:0 0 0.5rem 0; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-download" style="color:var(--primary-emerald);"></i> 1. Cadangkan Data (Backup Data)
+              </h4>
+              <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 1rem 0;">Pilih item data yang ingin
+                diunduh ke berkas cadangan (.json) untuk disimpan secara lokal atau dipindahkan ke perangkat lain:</p>
+
+              <div
+                style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; background:#F8FAFC; padding:1rem; border-radius:8px; border:1px solid #E2E8F0;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="chk-backup-logs" checked>
+                  <i class="fas fa-book" style="color:#2563EB;"></i> Jurnal &amp; Beban Kerja
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="chk-backup-siswa" checked>
+                  <i class="fas fa-users" style="color:#059669;"></i> Master Data Siswa
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="chk-backup-materi" checked>
+                  <i class="fas fa-book-open" style="color:#D97706;"></i> Master Modul Materi
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer; margin:0;">
+                  <input type="checkbox" id="chk-backup-settings" checked>
+                  <i class="fas fa-cogs" style="color:#7C3AED;"></i> Profil &amp; Pengaturan Kegiatan
+                </label>
+              </div>
+
+              <button type="button" id="btn-export-json-backup" class="btn-primary">
+                <i class="fas fa-file-download"></i> Unduh Berkas Backup (.json)
+              </button>
+            </div>
+
+            <!-- SECTION 2: RESTORE DATA -->
+            <div
+              style="background:#FFFFFF; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.75rem;">
+              <h4 style="color:var(--primary-navy); margin:0 0 0.5rem 0; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-upload" style="color:#2563EB;"></i> 2. Pemulihan Data (Restore Data)
+              </h4>
+              <p style="font-size:0.85rem; color:var(--text-secondary); margin:0 0 1rem 0;">Unggah berkas cadangan
+                (.json) untuk memulihkan jurnal, data siswa, materi, atau pengaturan ke dalam aplikasi:</p>
+
+              <div class="form-group" style="margin-bottom:1.25rem; max-width:500px;">
+                <label style="font-weight:600; margin-bottom:0.5rem; display:block;">Pilih Berkas Backup (.json)</label>
+                <input type="file" id="file-restore-json" class="form-control" accept=".json" style="padding:8px;">
+              </div>
+
+              <button type="button" id="btn-import-json-restore" class="btn-secondary"
+                style="background:#2563EB; color:#FFF; border:none;" disabled>
+                <i class="fas fa-sync-alt"></i> Pulihkan Data dari Berkas
+              </button>
+            </div>
+
+            <!-- SECTION 3: DANGER ZONE (RESET DATA) -->
+            <div style="background:#FEF2F2; border:1px solid #FCA5A5; border-radius:var(--radius-md); padding:1.25rem;">
+              <h4 style="color:#991B1B; margin:0 0 0.5rem 0; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-exclamation-triangle" style="color:#DC2626;"></i> 3. Zona Bahaya (Reset Semua Data)
+              </h4>
+              <p style="font-size:0.85rem; color:#7F1D1D; margin:0 0 1rem 0;">Tindakan ini akan <strong>menghapus secara
+                  permanen</strong> seluruh entri jurnal harian, data siswa, modul materi, serta mengembalikan semua
+                pengaturan ke kondisi awal (pabrik).</p>
+
+              <button type="button" id="btn-reset-all-data" class="btn-danger" style="padding:0.75rem 1.25rem;">
+                <i class="fas fa-trash-restore"></i> Reset Semua Data (Factory Reset)
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 1: TAMBAH SISWA
+       =================================================================== -->
+  <div id="modal-add-siswa" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Tambah Data Siswa Baru</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-add-siswa">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>NISN Siswa (Unique ID)</label>
+            <input type="text" id="modal-nisn" class="form-control" placeholder="10 Digit NISN" required>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Nama Lengkap Siswa</label>
+            <input type="text" id="modal-nama" class="form-control" placeholder="Nama lengkap siswa" required>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Kelas</label>
+            <input type="text" id="modal-kelas" class="form-control" placeholder="Contoh: 7A, 8B, 9C" required>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Jenis Kelamin</label>
+            <select id="modal-jk" class="form-control">
+              <option value="L">Laki-laki (L)</option>
+              <option value="P">Perempuan (P)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Agama</label>
+            <input type="text" id="modal-agama" class="form-control" value="Islam">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Siswa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 2: TAMBAH MATERI
+       =================================================================== -->
+  <div id="modal-add-materi" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Tambah Modul Materi Pembelajaran</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-add-materi">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Tingkatan Kelas</label>
+            <select id="modal-materi-kelas" class="form-control">
+              <option value="7">Kelas 7</option>
+              <option value="8">Kelas 8</option>
+              <option value="9">Kelas 9</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Mata Pelajaran</label>
+            <input type="text" id="modal-materi-mapel" class="form-control"
+              placeholder="Contoh: IPA, Matematika, B. Indonesia" required>
+          </div>
+          <div class="form-group">
+            <label>Topik Pembelajaran</label>
+            <input type="text" id="modal-materi-topik" class="form-control"
+              placeholder="Contoh: Sistem Pencernaan Manusia" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-primary">Simpan Materi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL: IMPORT MATERI EXCEL / CSV
+       =================================================================== -->
+  <div id="modal-import-materi" class="modal-overlay">
+    <div class="modal-container" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-excel" style="color:#10B981;"></i> Import Data Modul &amp; Materi Pembelajaran</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-import-materi">
+        <div class="modal-body">
+          <div
+            style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
+            <h5 style="color:#065F46; margin:0 0 0.5rem 0; font-weight:700;"><i class="fas fa-info-circle"></i> Petunjuk
+              &amp; Format Kolom Tabel Excel</h5>
+            <p style="font-size:0.85rem; color:#047857; margin:0 0 0.75rem 0;">Pastikan berkas Excel (`.xlsx`, `.xls`)
+              atau CSV Anda memiliki urutan/struktur kolom sebagai berikut:</p>
+
+            <div style="overflow-x:auto;">
+              <table
+                style="width:100%; border-collapse:collapse; font-size:0.8rem; background:#FFF; border:1px solid #CBD5E1;">
+                <thead>
+                  <tr style="background:#F1F5F9; text-align:left;">
+                    <th style="padding:6px; border:1px solid #CBD5E1;">Kolom A (Tingkat)</th>
+                    <th style="padding:6px; border:1px solid #CBD5E1;">Kolom B (Mata Pelajaran)</th>
+                    <th style="padding:6px; border:1px solid #CBD5E1;">Kolom C (Topik Pembelajaran)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">7 (atau Kelas 7)</td>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">IPA</td>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">Sistem Pencernaan Manusia</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">8 (atau Kelas 8)</td>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">Matematika</td>
+                    <td style="padding:6px; border:1px solid #CBD5E1;">Persamaan Garis Lurus</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1.25rem;">
+            <label style="font-weight:700; color:var(--primary-navy); margin-bottom:0.5rem; display:block;">
+              <i class="fas fa-upload"></i> Pilih File Excel / CSV
+            </label>
+            <input type="file" id="file-import-materi" class="form-control" accept=".xlsx, .xls, .csv" required
+              style="padding: 10px;">
+            <small class="text-muted" style="display:block; margin-top:4px;">Format yang didukung: .xlsx, .xls,
+              .csv</small>
+          </div>
+
+          <div id="materi-import-preview-box"
+            style="display:none; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:8px; padding:1rem; margin-top:1rem;">
+            <h5 style="margin:0 0 0.5rem 0; color:var(--primary-navy);"><i class="fas fa-eye"></i> Pratinjau Data
+              Ditemukan: <span id="materi-import-count" class="badge" style="background:#DBEAFE; color:#1E40AF;">0
+                Data</span></h5>
+            <div style="max-height: 180px; overflow-y:auto;">
+              <table class="data-table" style="font-size:0.8rem;">
+                <thead>
+                  <tr>
+                    <th>Tingkat</th>
+                    <th>Mapel</th>
+                    <th>Topik Pembelajaran</th>
+                  </tr>
+                </thead>
+                <tbody id="materi-import-preview-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" id="btn-confirm-import-materi" class="btn-primary" disabled><i
+              class="fas fa-file-import"></i> Import Sekarang</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 3: PRATINJAU IMPORT EXCEL
+       =================================================================== -->
+  <div id="modal-excel-preview" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>Pratinjau Data Impor Excel</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div id="modal-excel-preview-body" class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+        <button type="button" id="btn-confirm-import" class="btn-primary">Impor Data Siswa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 4: PANDUAN INTEGRASI GOOGLE SHEETS & GITHUB PAGES
+       =================================================================== -->
+  <div id="modal-sheets-sync-guide" class="modal-overlay">
+    <div class="modal-container" style="max-width: 780px;">
+      <div class="modal-header">
+        <h3><i class="fab fa-google-drive" style="color:#0F766E;"></i> Panduan Integrasi Google Sheets & GitHub Pages
+        </h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4 style="margin-bottom:0.5rem; color:var(--primary-navy);">Langkah 1: Buat Google Sheet Baru</h4>
+        <ol style="margin-left: 1.25rem; margin-bottom: 1.25rem; font-size:0.9rem;">
+          <li>Buka <a href="https://sheets.new" target="_blank" rel="noopener">Google Sheets (sheets.new)</a> dan buat
+            spreadsheet baru.</li>
+          <li>Beri nama spreadsheet: <code>JurnalGuru_Pro_SMPN13</code>.</li>
+        </ol>
+
+        <h4 style="margin-bottom:0.5rem; color:var(--primary-navy);">Langkah 2: Salin Kode Google Apps Script</h4>
+        <p style="font-size:0.88rem; margin-bottom:0.5rem;">Klik menu <strong>Extensions &gt; Apps Script</strong> pada
+          Google Sheets Anda, lalu salin dan tempelkan kode berikut:</p>
+        <div style="position:relative;">
+          <pre id="apps-script-code-snippet" class="code-block"></pre>
+          <button id="btn-copy-script-code" class="btn-secondary"
+            style="position:absolute; top:8px; right:8px; padding:4px 10px; font-size:0.75rem;"><i
+              class="fas fa-copy"></i> Copy Kode</button>
+        </div>
+
+        <h4 style="margin-bottom:0.5rem; margin-top:1.25rem; color:var(--primary-navy);">Langkah 3: Deploy sebagai Web
+          App</h4>
+        <ol style="margin-left: 1.25rem; margin-bottom: 1.25rem; font-size:0.9rem;">
+          <li>Klik tombol <strong>Deploy &gt; New deployment</strong> di kanan atas Apps Script.</li>
+          <li>Pilih jenis deployment: <strong>Web app</strong>.</li>
+          <li>Setel <strong>Execute as</strong>: <code>Me</code> dan <strong>Who has access</strong>:
+            <code>Anyone</code>.
+          </li>
+          <li>Klik <strong>Deploy</strong>, lalu berikan izin akses (Authorize access).</li>
+          <li>Salin <strong>Web App URL</strong> yang dihasilkan, lalu tempel di menu <strong>Pengaturan &gt; Web App
+              URL</strong> aplikasi ini!</li>
+        </ol>
+
+        <div
+          style="background:#EFF6FF; border:1px solid #93C5FD; padding:0.85rem 1rem; border-radius:8px; margin-bottom:1.25rem; font-size:0.85rem; color:#1E40AF;">
+          <strong><i class="fas fa-database"></i> Model Database Pribadi Per Guru:</strong><br>
+          Website ini dipasang satu kali dan dapat diakses oleh seluruh guru. Setiap guru menghubungkan <strong>Google
+            Sheets Database Pribadi milik masing-masing</strong>.<br>
+          Ketika guru lain hendak menggunakan aplikasi ini di perangkat yang sama, cukup klik tombol <strong>"Ganti
+            Database"</strong> di header atau Pengaturan untuk memutuskan database lama dan memasukkan link Google
+          Sheets pribadi milik guru yang baru!
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-primary btn-close-modal">Mengerti &amp; Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT SLOT ISTIRAHAT -->
+  <div id="modal-edit-ist-slot" class="modal-overlay">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-edit" style="color:var(--primary-emerald);"></i> Edit Slot Jam Istirahat</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-edit-ist-slot">
+        <div class="modal-body">
+          <input type="hidden" id="edit-ist-idx">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Nama Slot Istirahat</label>
+            <input type="text" id="edit-ist-nama" class="form-control" required
+              placeholder="Contoh: Istirahat 1 / Makan Siang">
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Jam Mulai</label>
+              <select id="edit-ist-jam-mulai" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label>Jam Selesai</label>
+              <select id="edit-ist-jam-selesai" class="form-control" required></select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL EDIT JURNAL HARIAN (BERANDA) -->
+  <div id="modal-edit-jurnal-beranda" class="modal-overlay">
+    <div class="modal-container" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-edit" style="color:var(--primary-emerald);"></i> Edit Entri Jurnal</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-edit-jurnal-beranda">
+        <div class="modal-body">
+          <input type="hidden" id="edit-jurnal-id">
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Tanggal</label>
+            <input type="date" id="edit-jurnal-tanggal" class="form-control" required>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:1rem;">
+            <div class="form-group">
+              <label>Jam Mulai</label>
+              <select id="edit-jurnal-jam-mulai" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label>Jam Selesai</label>
+              <select id="edit-jurnal-jam-selesai" class="form-control" required></select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Kegiatan / Materi Pembelajaran</label>
+            <input type="text" id="edit-jurnal-kegiatan" class="form-control" required>
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label>Hasil / Catatan / Deskripsi</label>
+            <textarea id="edit-jurnal-hasil" class="form-control" rows="3" required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Saving Loader Overlay -->
+  <div id="saving-overlay" class="saving-overlay" style="display:none;" aria-hidden="true">
+    <div class="saving-card">
+      <div class="saving-spinner">
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+        <div class="spinner-ring"></div>
+      </div>
+      <p class="saving-title"><i class="fas fa-cloud-upload-alt"></i> Menyimpan Jurnal...</p>
+      <p class="saving-sub">Mohon tunggu, data sedang dikirim ke Google Sheets</p>
+    </div>
+  </div>
+
+  <!-- Main JavaScript App Entry -->
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
