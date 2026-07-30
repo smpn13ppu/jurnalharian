@@ -115,7 +115,7 @@ export const JurnalMingguanView = {
     }
 
     const btnPrint = document.getElementById('btn-print-jurnal-mingguan');
-    if (btnPrint) btnPrint.onclick = () => ExportService.printReport();
+    if (btnPrint) btnPrint.onclick = () => this.printJurnalMingguan();
 
     const btnExcel = document.getElementById('btn-export-jm-mingguan-excel');
     if (btnExcel) {
@@ -136,6 +136,198 @@ export const JurnalMingguanView = {
         window.App.showToast('File Excel Jurnal Mingguan 37.5 Jam berhasil diunduh!', 'success');
       };
     }
+  },
+
+  printJurnalMingguan() {
+    const { mondayStr, saturdayStr } = getWeekRange();
+    const startDateStr = document.getElementById('jm-print-tgl-start')?.value || mondayStr;
+    const endDateStr = document.getElementById('jm-print-tgl-end')?.value || saturdayStr;
+
+    const guruName = document.getElementById('jm-print-nama-guru')?.value || Store.getSettings().namaGuru || '-';
+    const nipGuru = document.getElementById('jm-print-nip-guru')?.value || Store.getSettings().nipGuru || '-';
+    const kepsekName = document.getElementById('jm-print-nama-kepsek')?.value || Store.getSettings().namaKepsek || '-';
+    const nipKepsek = document.getElementById('jm-print-nip-kepsek')?.value || Store.getSettings().nipKepsek || '-';
+    const tempatCetak = document.getElementById('jm-print-tempat')?.value || Store.getSettings().tempatCetak || 'Penajam';
+    const tglCetak = document.getElementById('jm-print-tgl-cetak')?.value || new Date().toISOString().split('T')[0];
+    const orientasi = document.getElementById('jm-print-orientasi')?.value || Store.getSettings().orientasiCetak || 'portrait';
+
+    const workload = Store.getWeeklyWorkload(startDateStr, endDateStr);
+    const settings = Store.getSettings();
+
+    let tableRowsHtml = '';
+    if (workload.filteredLogs.length === 0) {
+      tableRowsHtml = `<tr><td colspan="7" style="text-align:center; padding: 1.5rem; border:1px solid #000;">Tidak ada log jurnal pada periode ${startDateStr} s/d ${endDateStr}.</td></tr>`;
+    } else {
+      workload.filteredLogs.forEach((l, idx) => {
+        const durasiJamText = `${Math.floor(l.durasiMenit / 60)}j ${l.durasiMenit % 60}m`;
+        const rawKegiatan = (l.materi || l.kegiatan || '-').includes(' - ') ? (l.materi || l.kegiatan).split(' - ').slice(1).join(' - ') : (l.materi || l.kegiatan || '-');
+        const cleanKegiatan = rawKegiatan.replace(/[\[\]]/g, '');
+        const cleanHasil = (l.hasil || '-').replace(/[\[\]]/g, '');
+        const displayKegiatan = formatKategoriDisplay(l.kategori);
+
+        tableRowsHtml += `
+          <tr>
+            <td style="text-align:center; border:1px solid #000; padding:6px;">${idx + 1}</td>
+            <td style="border:1px solid #000; padding:6px;"><strong>${window.App ? window.App.formatDateID(l.tanggal) : l.tanggal}</strong></td>
+            <td style="text-align:center; border:1px solid #000; padding:6px;">${l.waktu}</td>
+            <td style="border:1px solid #000; padding:6px;">${displayKegiatan}</td>
+            <td style="border:1px solid #000; padding:6px;">${cleanKegiatan}</td>
+            <td style="text-align:center; border:1px solid #000; padding:6px; font-weight:bold;">${durasiJamText}</td>
+            <td style="border:1px solid #000; padding:6px;">${cleanHasil}</td>
+          </tr>
+        `;
+      });
+    }
+
+    const printHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Laporan Jurnal Mingguan 37.5 Jam</title>
+        <style>
+          @page {
+            size: A4 ${orientasi};
+            margin: 1.2cm 1cm 1.2cm 1cm;
+          }
+          body {
+            font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
+            font-size: 11pt;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+          }
+          .report-title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+          }
+          .report-subtitle {
+            text-align: center;
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 4px;
+          }
+          .report-period {
+            text-align: center;
+            font-size: 10pt;
+            margin-bottom: 15px;
+          }
+          table.report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10pt;
+          }
+          table.report-table th {
+            background-color: #00796B !important;
+            color: #ffffff !important;
+            border: 1px solid #000000 !important;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: bold;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          table.report-table td {
+            border: 1px solid #000000 !important;
+            padding: 6px;
+            vertical-align: top;
+          }
+          .summary-box {
+            margin-top: 15px;
+            border: 1px solid #000;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 10.5pt;
+          }
+          .signature-table {
+            width: 100%;
+            border: none;
+            margin-top: 30px;
+            page-break-inside: avoid;
+          }
+          .signature-table td {
+            border: none !important;
+            padding: 0;
+            text-align: center;
+            vertical-align: top;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="report-title">LAPORAN JURNAL MINGGUAN BEBAN KERJA GURU (37,5 JAM/MINGGU)</div>
+        <div class="report-subtitle">${settings.sekolah || '-'}</div>
+        <div class="report-period">Periode: ${window.App ? window.App.formatDateID(startDateStr) : startDateStr} s/d ${window.App ? window.App.formatDateID(endDateStr) : endDateStr} | Total Akumulasi: <strong>${workload.displayTime}</strong></div>
+
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th style="width: 35px;">No</th>
+              <th style="width: 95px;">Tanggal</th>
+              <th style="width: 100px;">Jam / Waktu</th>
+              <th style="width: 110px;">Kegiatan</th>
+              <th>Materi / Uraian Tugas</th>
+              <th style="width: 85px;">Durasi</th>
+              <th>Hasil / Deskripsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRowsHtml}
+          </tbody>
+        </table>
+
+        <div class="summary-box">
+          Total Durasi Beban Kerja Efektif: ${workload.displayTime}
+        </div>
+
+        <table class="signature-table">
+          <tr>
+            <td style="width: 50%;">
+              <p>Mengetahui,</p>
+              <p><strong>Kepala Sekolah</strong></p>
+              <div style="height: 60px;"></div>
+              <p><strong><u>${kepsekName}</u></strong></p>
+              <p>NIP. ${nipKepsek}</p>
+            </td>
+            <td style="width: 50%;">
+              <p>${tempatCetak}, ${formatDateLongID(tglCetak)}</p>
+              <p><strong>Guru Mata Pelajaran</strong></p>
+              <div style="height: 60px;"></div>
+              <p><strong><u>${guruName}</u></strong></p>
+              <p>NIP. ${nipGuru}</p>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    // Hidden iframe print execution
+    let iframe = document.getElementById('print-hidden-iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'print-hidden-iframe';
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+    }
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(printHtml);
+    doc.close();
+
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    }, 400);
   },
 
   applyPrintOrientation(orientasi = 'portrait') {

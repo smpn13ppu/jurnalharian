@@ -1143,7 +1143,7 @@ textarea.form-control {
     color: #000 !important;
     width: 100% !important;
   }
-  .main-header, .drawer-overlay, .sidebar, .section-header-banner, .print-setup-box, .table-toolbar, .toolbar-right, .btn-primary, .btn-secondary, .btn-danger, .burger-btn, .toast-container, .status-badge-pending-print {
+  .main-header, .drawer-overlay, .sidebar, .mobile-bottom-nav, .connection-guard-banner, .section-header-banner, .print-setup-box, .table-toolbar, .toolbar-right, .btn-primary, .btn-secondary, .btn-danger, .btn-success, .burger-btn, .toast-container, .status-badge-pending-print, .modal-overlay, .custom-alert-overlay, nav, footer:not(.official-print-footer) {
     display: none !important;
   }
   .main-content {
