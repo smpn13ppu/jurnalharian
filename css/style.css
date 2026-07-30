@@ -176,18 +176,17 @@ a {
 }
 
 .school-logo-badge {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-navy), var(--primary-emerald));
-  color: #fff;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0F766E 0%, #0D9488 100%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.1rem;
-  box-shadow: var(--shadow-sm);
+  font-size: 1.25rem;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.35);
+  flex-shrink: 0;
 }
 
 .brand-text h1 {
@@ -1573,9 +1572,10 @@ textarea.form-control {
   }
 
   .school-logo-badge {
-    width: 34px !important;
-    height: 34px !important;
-    font-size: 0.9rem !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1.05rem !important;
+    border-radius: 10px !important;
   }
 
   .brand-text h1 {

@@ -557,7 +557,69 @@ export const PengaturanView = {
           window.App.showToast(err.message, 'error');
         } finally {
           btnPushNow.disabled = false;
-          btnPushNow.innerHTML = '<i class="fas fa-sync"></i> Sinkronkan Sekarang';
+          btnPushNow.innerHTML = '<i class="fas fa-upload"></i> Kirim Semua Data';
+        }
+      };
+    }
+
+    // Trigger Open Pull Data Modal
+    const btnOpenPullHeader = document.getElementById('btn-open-pull-modal-header');
+    const btnPullNow = document.getElementById('btn-pull-sheets-now');
+    
+    const openPullModal = () => {
+      if (!Store.isConnectedToSheets()) {
+        window.App.showToast('Silakan hubungkan URL Google Sheets terlebih dahulu!', 'warning');
+        window.App.openModal('modal-sheets-sync-guide');
+        return;
+      }
+      window.App.openModal('modal-pull-sheets-data');
+    };
+
+    if (btnOpenPullHeader) btnOpenPullHeader.onclick = openPullModal;
+    if (btnPullNow) btnPullNow.onclick = openPullModal;
+
+    // Handle Form Pull Sheets Data Submission
+    const formPull = document.getElementById('form-pull-sheets-data');
+    if (formPull) {
+      const modalPull = document.getElementById('modal-pull-sheets-data');
+      if (modalPull) {
+        modalPull.querySelectorAll('.modal-close-btn, .btn-close-modal').forEach(btn => {
+          btn.onclick = () => window.App.closeModal('modal-pull-sheets-data');
+        });
+      }
+
+      formPull.onsubmit = async (e) => {
+        e.preventDefault();
+        const pullOptions = {
+          logs: document.getElementById('chk-pull-logs')?.checked || false,
+          siswa: document.getElementById('chk-pull-siswa')?.checked || false,
+          materi: document.getElementById('chk-pull-materi')?.checked || false,
+          pengaturan: document.getElementById('chk-pull-pengaturan')?.checked || false
+        };
+
+        if (!pullOptions.logs && !pullOptions.siswa && !pullOptions.materi && !pullOptions.pengaturan) {
+          window.App.showToast('Pilih minimal satu jenis data yang ingin ditarik!', 'warning');
+          return;
+        }
+
+        const submitBtn = formPull.querySelector('button[type="submit"]');
+        try {
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menarik Data...';
+          }
+          const res = await SheetsService.pullDataFromSheet(pullOptions);
+          window.App.closeModal('modal-pull-sheets-data');
+          window.App.showToast(res.message, 'success');
+          window.App.refreshDashboard();
+          window.App.updateHeaderSchoolName();
+        } catch (err) {
+          window.App.showToast(err.message, 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-download"></i> Tarik &amp; Gabungkan Data';
+          }
         }
       };
     }

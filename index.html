@@ -35,7 +35,7 @@
           <i class="fas fa-bars"></i>
         </button>
         <div class="school-brand">
-          <div class="school-logo-badge">13</div>
+          <div class="school-logo-badge"><i class="fas fa-book-bookmark"></i></div>
           <div class="brand-text">
             <h1>JurnalGuru Pro</h1>
             <p id="header-school-name">Satuan Pendidikan</p>
@@ -804,8 +804,10 @@
             <h2>Pengaturan Sistem & Database Google Sheets</h2>
             <p>Konfigurasi profil sekolah, nama guru/kepsek, dan integrasi Google Sheets API.</p>
           </div>
-          <button id="btn-open-sync-modal" class="btn-primary"><i class="fas fa-link"></i> Panduan Sync Google
-            Sheets</button>
+          <div class="toolbar-right" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button type="button" id="btn-open-pull-modal-header" class="btn-secondary" style="background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3);"><i class="fas fa-cloud-download-alt"></i> Tarik Data dari Sheets</button>
+            <button id="btn-open-sync-modal" class="btn-primary"><i class="fas fa-link"></i> Panduan Sync Google Sheets</button>
+          </div>
         </div>
 
         <!-- Sub-Tabs Navigasi Pengaturan -->
@@ -867,12 +869,10 @@
 
               <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Simpan Profil</button>
-                <button type="button" id="btn-test-sheets-conn" class="btn-secondary"><i class="fas fa-plug"></i> Uji
-                  Koneksi Sheets</button>
-                <button type="button" id="btn-push-sheets-now" class="btn-secondary"><i class="fas fa-sync"></i>
-                  Sinkronkan Sekarang</button>
-                <button type="button" id="btn-disconnect-sheets" class="btn-danger"><i
-                    class="fas fa-right-from-bracket"></i> Putuskan Database &amp; Ganti Guru</button>
+                <button type="button" id="btn-test-sheets-conn" class="btn-secondary"><i class="fas fa-plug"></i> Uji Koneksi Sheets</button>
+                <button type="button" id="btn-push-sheets-now" class="btn-secondary"><i class="fas fa-upload"></i> Kirim Semua Data</button>
+                <button type="button" id="btn-pull-sheets-now" class="btn-secondary" style="background:#EFF6FF; color:#1E40AF; border-color:#93C5FD; font-weight:700;"><i class="fas fa-cloud-download-alt" style="color:#2563EB;"></i> Tarik Data dari Sheets</button>
+                <button type="button" id="btn-disconnect-sheets" class="btn-danger"><i class="fas fa-right-from-bracket"></i> Putuskan Database &amp; Ganti Guru</button>
               </div>
             </form>
           </div>
@@ -1320,6 +1320,53 @@
         <button type="button" class="btn-secondary btn-close-modal">Batal</button>
         <button type="button" id="btn-confirm-import" class="btn-primary">Impor Data Siswa</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODAL 3.5: TARIK DATA DARI GOOGLE SHEETS
+       =================================================================== -->
+  <div id="modal-pull-sheets-data" class="modal-overlay">
+    <div class="modal-container" style="max-width: 520px;">
+      <div class="modal-header" style="border-bottom: 2px solid #0F766E;">
+        <h3 style="color:#0F766E;"><i class="fas fa-cloud-download-alt" style="color:#0F766E; margin-right:8px;"></i> Tarik Data dari Google Sheets</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <form id="form-pull-sheets-data">
+        <div class="modal-body" style="padding: 1.25rem 1rem;">
+          <p style="color:#475569; font-size:0.88rem; line-height:1.55; margin-bottom:1.25rem;">
+            Sistem akan membaca spreadsheet Anda dan <strong>hanya menarik data baru yang belum ada di website</strong> (data yang sudah ada tidak akan diduplikasi/ditimpa).
+          </p>
+
+          <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:1.1rem 1.25rem; border-radius:14px; display:flex; flex-direction:column; gap:0.85rem;">
+            <label style="font-size:0.85rem; font-weight:800; color:#334155; display:block; margin-bottom:0.2rem;">Pilih Jenis Data yang Ingin Ditarik:</label>
+            
+            <label style="display:flex; align-items:center; gap:10px; font-size:0.88rem; cursor:pointer; color:#1E293B; font-weight:600;">
+              <input type="checkbox" id="chk-pull-logs" checked style="width:18px; height:18px; accent-color:#0F766E; cursor:pointer;">
+              <span><i class="fas fa-history" style="color:#0F766E; width:20px;"></i> Master Log Jurnal Mengajar</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:10px; font-size:0.88rem; cursor:pointer; color:#1E293B; font-weight:600;">
+              <input type="checkbox" id="chk-pull-siswa" checked style="width:18px; height:18px; accent-color:#059669; cursor:pointer;">
+              <span><i class="fas fa-user-graduate" style="color:#059669; width:20px;"></i> Master Data Siswa</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:10px; font-size:0.88rem; cursor:pointer; color:#1E293B; font-weight:600;">
+              <input type="checkbox" id="chk-pull-materi" checked style="width:18px; height:18px; accent-color:#D97706; cursor:pointer;">
+              <span><i class="fas fa-book-open" style="color:#D97706; width:20px;"></i> Master Modul Materi</span>
+            </label>
+
+            <label style="display:flex; align-items:center; gap:10px; font-size:0.88rem; cursor:pointer; color:#1E293B; font-weight:600;">
+              <input type="checkbox" id="chk-pull-pengaturan" checked style="width:18px; height:18px; accent-color:#3B82F6; cursor:pointer;">
+              <span><i class="fas fa-sliders" style="color:#3B82F6; width:20px;"></i> Pengaturan Profil Sekolah &amp; Pejabat</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer" style="justify-content: space-between;">
+          <button type="button" class="btn-secondary btn-close-modal">Batal</button>
+          <button type="submit" class="btn-primary" style="background:#0F766E; border-color:#0F766E; font-weight:700;"><i class="fas fa-download"></i> Tarik &amp; Gabungkan Data</button>
+        </div>
+      </form>
     </div>
   </div>
 

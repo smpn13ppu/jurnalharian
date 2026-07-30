@@ -87,7 +87,163 @@ export const SheetsService = {
     return { status: 'success', message: 'Seluruh data (Jurnal, Siswa, Materi, & Pengaturan) berhasil disinkronisasikan ke Google Sheets!' };
   },
 
-  // Generate Multi-User Google Apps Script Template Code for user (Anti-Duplicate / Upsert)
+  // Pull All Data from Google Sheets and Smart Merge (Anti-Duplicate)
+  async pullDataFromSheet(options = { logs: true, siswa: true, materi: true, pengaturan: true }) {
+    const settings = Store.getSettings();
+    if (!settings.appsScriptUrl) {
+      throw new Error('Google Apps Script Web App URL belum dikonfigurasi di Pengaturan!');
+    }
+
+    let remoteData = null;
+
+    try {
+      // Try GET request first
+      const getUrl = settings.appsScriptUrl + (settings.appsScriptUrl.includes('?') ? '&' : '?') + 'action=fetch_all';
+      const res = await fetch(getUrl);
+      if (res.ok) {
+        remoteData = await res.json();
+      }
+    } catch (e) {
+      console.warn('GET fetch failed, trying POST fetch_all:', e);
+    }
+
+    if (!remoteData || remoteData.status !== 'success') {
+      // Fallback: POST request for fetch_all
+      try {
+        const response = await fetch(settings.appsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'fetch_all' })
+        });
+        if (response.ok) {
+          remoteData = await response.json();
+        }
+      } catch (err) {
+        throw new Error('Gagal menarik data dari Google Sheets. Pastikan Web App disetel Access: Anyone & Deploy Ulang jika perlu.');
+      }
+    }
+
+    if (!remoteData || remoteData.status !== 'success') {
+      throw new Error('Gagal membaca data dari Google Sheets: ' + (remoteData ? remoteData.message : 'Respon tidak valid'));
+    }
+
+    let addedLogsCount = 0;
+    let addedSiswaCount = 0;
+    let addedMateriCount = 0;
+    let updatedSettingsCount = 0;
+
+    // 1. Smart Merge Logs
+    if (options.logs && Array.isArray(remoteData.logs) && remoteData.logs.length > 0) {
+      const currentLogs = Store.getLogs();
+      const existingMap = new Map();
+      currentLogs.forEach(l => {
+        if (l.id) existingMap.set(String(l.id).trim(), true);
+        if (l.tanggal && l.waktu && l.kelas) {
+          const signature = `${l.tanggal}_${l.waktu}_${l.kelas}`.toLowerCase().trim();
+          existingMap.set(signature, true);
+        }
+      });
+
+      const newLogsToInsert = [];
+      remoteData.logs.forEach(rl => {
+        const idKey = String(rl.id || '').trim();
+        const signatureKey = `${rl.tanggal}_${rl.waktu}_${rl.kelas}`.toLowerCase().trim();
+
+        if (!existingMap.has(idKey) && !existingMap.has(signatureKey)) {
+          newLogsToInsert.push(rl);
+          addedLogsCount++;
+        }
+      });
+
+      if (newLogsToInsert.length > 0) {
+        const mergedLogs = [...currentLogs, ...newLogsToInsert];
+        Store.saveLogs(mergedLogs);
+      }
+    }
+
+    // 2. Smart Merge Siswa
+    if (options.siswa && Array.isArray(remoteData.siswa) && remoteData.siswa.length > 0) {
+      const currentSiswa = Store.getSiswa();
+      const existingNisnMap = new Map();
+      const existingNamaMap = new Map();
+      currentSiswa.forEach(s => {
+        if (s.nisn) existingNisnMap.set(String(s.nisn).trim(), true);
+        if (s.nama && s.kelas) {
+          existingNamaMap.set(`${s.nama}_${s.kelas}`.toLowerCase().trim(), true);
+        }
+      });
+
+      const newSiswaToInsert = [];
+      remoteData.siswa.forEach(rs => {
+        const nisnKey = String(rs.nisn || '').trim();
+        const namaKey = `${rs.nama}_${rs.kelas}`.toLowerCase().trim();
+
+        if ((nisnKey && !existingNisnMap.has(nisnKey)) || (!nisnKey && !existingNamaMap.has(namaKey))) {
+          newSiswaToInsert.push(rs);
+          addedSiswaCount++;
+        }
+      });
+
+      if (newSiswaToInsert.length > 0) {
+        const mergedSiswa = [...currentSiswa, ...newSiswaToInsert];
+        Store.saveSiswa(mergedSiswa);
+      }
+    }
+
+    // 3. Smart Merge Materi
+    if (options.materi && Array.isArray(remoteData.materi) && remoteData.materi.length > 0) {
+      const currentMateri = Store.getMateri();
+      const existingMateriMap = new Map();
+      currentMateri.forEach(m => {
+        const key = `${m.mataPelajaran}_${m.topik}_${m.kelas || m.tingkat}`.toLowerCase().trim();
+        existingMateriMap.set(key, true);
+        if (m.id) existingMateriMap.set(String(m.id).trim(), true);
+      });
+
+      const newMateriToInsert = [];
+      remoteData.materi.forEach(rm => {
+        const matKey = `${rm.mataPelajaran}_${rm.topik}_${rm.kelas || rm.tingkat}`.toLowerCase().trim();
+        const matId = String(rm.id || '').trim();
+
+        if (!existingMateriMap.has(matKey) && (!matId || !existingMateriMap.has(matId))) {
+          newMateriToInsert.push(rm);
+          addedMateriCount++;
+        }
+      });
+
+      if (newMateriToInsert.length > 0) {
+        const mergedMateri = [...currentMateri, ...newMateriToInsert];
+        Store.saveMateri(mergedMateri);
+      }
+    }
+
+    // 4. Smart Merge Pengaturan
+    if (options.pengaturan && remoteData.pengaturan && Object.keys(remoteData.pengaturan).length > 0) {
+      const currSettings = Store.getSettings();
+      const updated = {
+        ...currSettings,
+        sekolah: remoteData.pengaturan.sekolah || currSettings.sekolah,
+        namaGuru: remoteData.pengaturan.namaGuru || currSettings.namaGuru,
+        nipGuru: remoteData.pengaturan.nipGuru || currSettings.nipGuru,
+        namaKepsek: remoteData.pengaturan.namaKepsek || currSettings.namaKepsek,
+        nipKepsek: remoteData.pengaturan.nipKepsek || currSettings.nipKepsek,
+        tempatCetak: remoteData.pengaturan.tempatCetak || currSettings.tempatCetak
+      };
+      Store.saveSettings(updated);
+      updatedSettingsCount++;
+    }
+
+    return {
+      status: 'success',
+      addedLogsCount,
+      addedSiswaCount,
+      addedMateriCount,
+      updatedSettingsCount,
+      message: `Tarik Data Sukses! Berhasil menambahkan ${addedLogsCount} Jurnal baru, ${addedSiswaCount} Siswa baru, dan ${addedMateriCount} Modul baru.`
+    };
+  },
+
+  // Generate Multi-User Google Apps Script Template Code for user (Anti-Duplicate / Upsert + Pull Data)
   getAppsScriptTemplateCode() {
     return `/**
  * Google Apps Script Multi-Guru Backend - JurnalGuru Pro (SMPN 13 PPU)
@@ -101,13 +257,107 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Google Apps Script Connected Multi-User!' }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+  if (action === 'fetch_all') {
+    return handleFetchAllData();
+  }
   return ContentService.createTextOutput(JSON.stringify({ status: 'active', app: 'JurnalGuru Pro Multi-Teacher API' }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function handleFetchAllData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var result = {
+    status: 'success',
+    logs: [],
+    siswa: [],
+    materi: [],
+    pengaturan: {}
+  };
+  
+  // 1. Read Master Log Jurnal
+  var sheetLog = ss.getSheetByName("Master Log Jurnal");
+  if (sheetLog && sheetLog.getLastRow() > 1) {
+    var logValues = sheetLog.getRange(2, 1, sheetLog.getLastRow() - 1, 12).getValues();
+    logValues.forEach(function(row) {
+      if (row[0]) {
+        result.logs.push({
+          id: String(row[0]).trim(),
+          createdAt: row[1] ? String(row[1]) : new Date().toISOString(),
+          namaGuru: row[2] || '',
+          nipGuru: row[3] || '',
+          tanggal: row[4] ? String(row[4]).split('T')[0] : '',
+          kategori: row[5] || 'MENGAJAR',
+          waktu: row[6] || '',
+          durasiMenit: parseInt(row[7] || 0, 10),
+          kelas: row[8] || '',
+          materi: row[9] || '',
+          catatanAbsen: row[10] || '',
+          hasil: row[11] || ''
+        });
+      }
+    });
+  }
+
+  // 2. Read Master Data Siswa
+  var sheetSiswa = ss.getSheetByName("Master Data Siswa");
+  if (sheetSiswa && sheetSiswa.getLastRow() > 1) {
+    var siswaValues = sheetSiswa.getRange(2, 1, sheetSiswa.getLastRow() - 1, 5).getValues();
+    siswaValues.forEach(function(row, idx) {
+      if (row[0] || row[1]) {
+        result.siswa.push({
+          id: 'SISWA-' + (row[0] ? String(row[0]).trim() : (idx + 1)),
+          nisn: String(row[0] || '').trim(),
+          nama: row[1] || '',
+          kelas: row[2] || '',
+          jenisKelamin: row[3] || 'L',
+          agama: row[4] || 'Islam'
+        });
+      }
+    });
+  }
+
+  // 3. Read Master Modul Materi
+  var sheetMateri = ss.getSheetByName("Master Modul Materi");
+  if (sheetMateri && sheetMateri.getLastRow() > 1) {
+    var materiValues = sheetMateri.getRange(2, 1, sheetMateri.getLastRow() - 1, 4).getValues();
+    materiValues.forEach(function(row, idx) {
+      if (row[0] || row[3]) {
+        result.materi.push({
+          id: String(row[0] || ('MAT-' + (idx + 1))).trim(),
+          kelas: row[1] || '',
+          tingkat: row[1] || '',
+          mataPelajaran: row[2] || '',
+          topik: row[3] || ''
+        });
+      }
+    });
+  }
+
+  // 4. Read Master Data Pengaturan
+  var sheetPengaturan = ss.getSheetByName("Master Data Pengaturan");
+  if (sheetPengaturan && sheetPengaturan.getLastRow() > 1) {
+    var pValues = sheetPengaturan.getRange(2, 1, sheetPengaturan.getLastRow() - 1, 3).getValues();
+    pValues.forEach(function(row) {
+      var key = String(row[1] || '').trim();
+      var val = row[2];
+      if (key === 'Nama Sekolah') result.pengaturan.sekolah = val;
+      else if (key === 'Nama Guru') result.pengaturan.namaGuru = val;
+      else if (key === 'NIP Guru') result.pengaturan.nipGuru = val;
+      else if (key === 'Nama Kepala Sekolah') result.pengaturan.namaKepsek = val;
+      else if (key === 'NIP Kepala Sekolah') result.pengaturan.nipKepsek = val;
+      else if (key === 'Tempat Cetak Laporan') result.pengaturan.tempatCetak = val;
+    });
+  }
+
+  return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
+    if (data.action === 'fetch_all') {
+      return handleFetchAllData();
+    }
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     
     // Helper: Map Existing Key to Row Index (1-based) to Prevent Duplicate Entries
