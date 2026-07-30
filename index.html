@@ -470,6 +470,37 @@
           </div>
         </div>
 
+        <!-- Analytics Grid: Kehadiran Per Kelas & Top 5 Siswa Perlu Perhatian -->
+        <div class="analytics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+          
+          <!-- KARTU 1: PERSENTASE KEHADIRAN PER KELAS -->
+          <div class="card" style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.25rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+              <h4 style="margin:0; font-size: 1rem; color: var(--primary-navy); display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-chart-pie" style="color: var(--primary-emerald);"></i> Persentase Kehadiran Per Kelas
+              </h4>
+              <span class="text-muted" style="font-size: 0.75rem;">Rekap Presensi KBM</span>
+            </div>
+            <div id="dashboard-kelas-attendance-container" style="display: flex; flex-direction: column; gap: 0.85rem;">
+              <p class="text-muted" style="text-align:center; padding: 1rem 0;">Memuat data presensi...</p>
+            </div>
+          </div>
+
+          <!-- KARTU 2: LIST 5 SISWA PERLU PERHATIAN (TIDAK TURUN) -->
+          <div class="card" style="background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.25rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+              <h4 style="margin:0; font-size: 1rem; color: #991B1B; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-exclamation-triangle" style="color: #DC2626;"></i> Siswa Perlu Perhatian (Top 5 Tidak Turun)
+              </h4>
+              <span class="badge" style="background:#FEE2E2; color:#DC2626; font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; font-weight:700;">Presensi Siswa</span>
+            </div>
+            <div id="dashboard-siswa-attention-container">
+              <p class="text-muted" style="text-align:center; padding: 1rem 0;">Memuat data ketidakhadiran...</p>
+            </div>
+          </div>
+
+        </div>
+
         <!-- Recent Logs Table -->
         <div class="table-card">
           <div class="table-toolbar">

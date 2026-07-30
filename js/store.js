@@ -145,27 +145,63 @@ export const Store = {
     this.saveMateri(list);
   },
 
+  // Utility to sort logs by input date & start time
+  sortLogs(logsArray, dateDirection = 'desc', timeDirection = 'asc') {
+    if (!Array.isArray(logsArray)) return [];
+
+    return [...logsArray].sort((a, b) => {
+      // 1. Compare Date (YYYY-MM-DD)
+      const dateA = a.tanggal || '';
+      const dateB = b.tanggal || '';
+      if (dateA !== dateB) {
+        return dateDirection === 'desc'
+          ? dateB.localeCompare(dateA)
+          : dateA.localeCompare(dateB);
+      }
+
+      // 2. Compare Start Time (e.g. "07:00 - 07:45" -> "07:00")
+      const getStartTime = (waktuStr) => {
+        if (!waktuStr) return '00:00';
+        return waktuStr.split('-')[0].trim();
+      };
+
+      const timeA = getStartTime(a.waktu);
+      const timeB = getStartTime(b.waktu);
+
+      if (timeA !== timeB) {
+        return timeDirection === 'desc'
+          ? timeB.localeCompare(timeA)
+          : timeA.localeCompare(timeB);
+      }
+
+      // 3. Fallback: ID / CreatedAt if date and time are identical
+      return (b.id || '').localeCompare(a.id || '');
+    });
+  },
+
   // Logs (Jurnal & Beban Kerja) CRUD
-  getLogs() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS)) || [];
+  getLogs(dateDirection = 'desc', timeDirection = 'asc') {
+    const raw = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS)) || [];
+    return this.sortLogs(raw, dateDirection, timeDirection);
   },
   saveLogs(logsArray) {
     localStorage.setItem(STORAGE_KEYS.LOGS, JSON.stringify(logsArray));
   },
   addLog(logEntry) {
     const settings = this.getSettings();
-    const logs = this.getLogs();
+    const rawLogs = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS)) || [];
     logEntry.id = 'LOG-' + Date.now();
     logEntry.createdAt = new Date().toISOString();
     logEntry.namaGuru = settings.namaGuru || 'Guru SMPN 13 PPU';
     logEntry.nipGuru = settings.nipGuru || '-';
-    logs.unshift(logEntry); // add to top
-    this.saveLogs(logs);
+    rawLogs.unshift(logEntry);
+    this.saveLogs(rawLogs);
     return logEntry;
   },
   deleteLog(id) {
-    const logs = this.getLogs().filter(l => l.id !== id);
-    this.saveLogs(logs);
+    const rawLogs = JSON.parse(localStorage.getItem(STORAGE_KEYS.LOGS)) || [];
+    const filtered = rawLogs.filter(l => l.id !== id);
+    this.saveLogs(filtered);
   },
 
   isConnectedToSheets() {
@@ -183,7 +219,7 @@ export const Store = {
 
   // Compute Weekly Workload (37.5 Hours Target)
   getWeeklyWorkload(startDateStr, endDateStr) {
-    const logs = this.getLogs();
+    const logs = this.getLogs('asc', 'asc'); // Chronological order (oldest date to newest date, morning to afternoon)
 
     const filteredLogs = logs.filter(l => {
       if (!l.tanggal) return false;
