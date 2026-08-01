@@ -14,6 +14,17 @@ function formatKategoriDisplay(kategori) {
   return 'Kegiatan Mandiri';
 }
 
+function formatDurasiJamText(durasiMenit, formatShort = true) {
+  const m = parseInt(durasiMenit || 0, 10);
+  const hours = Math.floor(m / 60);
+  const mins = m % 60;
+
+  if (hours === 0) {
+    return formatShort ? `${mins}m` : `${mins} Menit`;
+  }
+  return formatShort ? `${hours}j ${mins}m` : `${hours} Jam ${mins} Menit`;
+}
+
 function toLocalYMD(date) {
   if (!date || isNaN(date.getTime())) return new Date().toISOString().split('T')[0];
   const y = date.getFullYear();
@@ -159,7 +170,7 @@ export const JurnalMingguanView = {
       tableRowsHtml = `<tr><td colspan="7" style="text-align:center; padding: 1.5rem; border:1px solid #000;">Tidak ada log jurnal pada periode ${startDateStr} s/d ${endDateStr}.</td></tr>`;
     } else {
       workload.filteredLogs.forEach((l, idx) => {
-        const durasiJamText = `${Math.floor(l.durasiMenit / 60)}j ${l.durasiMenit % 60}m`;
+        const durasiJamText = formatDurasiJamText(l.durasiMenit, true);
         const rawKegiatan = (l.materi || l.kegiatan || '-').includes(' - ') ? (l.materi || l.kegiatan).split(' - ').slice(1).join(' - ') : (l.materi || l.kegiatan || '-');
         const cleanKegiatan = rawKegiatan.replace(/[\[\]]/g, '');
         const cleanHasil = (l.hasil || '-').replace(/[\[\]]/g, '');
@@ -187,7 +198,7 @@ export const JurnalMingguanView = {
         <style>
           @page {
             size: A4 ${orientasi};
-            margin: 1.2cm 1cm 1.2cm 1cm;
+            margin: 2.5cm 1.5cm 1.5cm 3cm;
           }
           body {
             font-family: 'Times New Roman', Times, serif, Arial, sans-serif;
@@ -337,8 +348,7 @@ export const JurnalMingguanView = {
       styleEl.id = 'dynamic-print-orientation-style';
       document.head.appendChild(styleEl);
     }
-    const isLandscape = orientasi === 'landscape';
-    const marginRule = isLandscape ? '1cm 1.2cm 1cm 1.2cm' : '1.2cm 1cm 1.2cm 1cm';
+    const marginRule = '2.5cm 1.5cm 1.5cm 3cm';
     styleEl.innerHTML = `@media print { @page { size: A4 ${orientasi}; margin: ${marginRule}; } }`;
   },
 
